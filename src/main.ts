@@ -11,6 +11,12 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
+    app.enableCors({
+        allowedHeaders: 'Content-Type, Authorization',
+        methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+        origin: '*',
+    });
+
     const config = new DocumentBuilder()
         .setTitle('API Documentation')
         .setDescription('The API description')
