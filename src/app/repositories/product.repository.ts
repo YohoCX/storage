@@ -54,10 +54,23 @@ export class Product {
         });
 
         if (!raw.length) {
-            return [];
+            return {
+                data: [],
+                total: 0,
+            };
         }
 
-        return raw.map((r) => this.mapRawToEntity(r));
+        const total = await this.prismaService.product.count({
+            where: {
+                category_id: filters.categoryId,
+                state: 'active',
+            },
+        });
+
+        return {
+            data: raw.map((r) => this.mapRawToEntity(r)),
+            total,
+        };
     }
 
     public async create(data: Entities.Product) {

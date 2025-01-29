@@ -32,10 +32,22 @@ export class Category {
         });
 
         if (!raw.length) {
-            return [];
+            return {
+                categories: [],
+                total: 0,
+            };
         }
 
-        return raw.map((r) => this.mapRawToEntity(r));
+        const total = await this.prismaService.category.count({
+            where: {
+                state: 'active',
+            },
+        });
+
+        return {
+            categories: raw.map((r) => this.mapRawToEntity(r)),
+            total,
+        };
     }
 
     async create(entity: Entities.Category) {

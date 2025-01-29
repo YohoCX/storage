@@ -26,15 +26,30 @@ export class Transaction {
 
     public async getAllPaginated(pagination: Types.PaginationOptions) {
         const raw = await this.prismaService.transaction.findMany({
+            where: {
+                state: 'active',
+            },
             skip: pagination.offset,
             take: pagination.limit,
         });
 
         if (!raw.length) {
-            return [];
+            return {
+                data: [],
+                total: 0,
+            };
         }
 
-        return raw.map((r) => this.mapRawToEntity(r));
+        const total = await this.prismaService.transaction.count({
+            where: {
+                state: 'active',
+            },
+        });
+
+        return {
+            data: raw.map((r) => this.mapRawToEntity(r)),
+            total,
+        };
     }
 
     public async createTransactionItems(

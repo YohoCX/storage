@@ -18,4 +18,8 @@ export class Category {
     public formatMany(entities: Entities.Category[]) {
         return { data: entities.map((entity) => this.format(entity)) };
     }
+
+    public formatPaginated(entities: Entities.Category[], total: number) {
+        return { data: entities.map((entity) => this.format(entity)), total };
+    }
 }

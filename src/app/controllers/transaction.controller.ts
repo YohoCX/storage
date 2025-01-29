@@ -25,7 +25,8 @@ export class Transaction {
     @Get()
     @ApiOperation({ summary: 'Get all transactions' })
     async getAllTransactions(@Query() pagination: DTOs.Pagination) {
-        return this.transactionPresenter.formatMany(await this.transactionService.getAllPaginated(pagination.options));
+        const data = await this.transactionService.getAllPaginated(pagination.options);
+        return this.transactionPresenter.formatPaginated(data.data, data.total);
     }
 
     @Post('withdraw')

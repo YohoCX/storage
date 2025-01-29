@@ -20,4 +20,8 @@ export class Transaction {
     public formatMany(entities: Entities.Transaction[]) {
         return { data: entities.map((entity) => this.format(entity)) };
     }
+
+    public formatPaginated(entities: Entities.Transaction[], total: number) {
+        return { data: entities.map((entity) => this.format(entity)), total };
+    }
 }

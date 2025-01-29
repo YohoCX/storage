@@ -24,7 +24,8 @@ export class Category {
     @Get()
     @ApiOperation({ summary: 'Get all categories' })
     async getAllCategories(@Query() pagination: DTOs.Pagination) {
-        return this.categoryPresenter.formatMany(await this.categoryService.getAllPaginated(pagination.options));
+        const data = await this.categoryService.getAllPaginated(pagination.options);
+        return this.categoryPresenter.formatPaginated(data.categories, data.total);
     }
 
     @Post()

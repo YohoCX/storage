@@ -21,4 +21,8 @@ export class Product {
     public formatMany(entities: Entities.Product[]) {
         return { data: entities.map((entity) => this.format(entity)) };
     }
+
+    public formatPaginated(entities: Entities.Product[], total: number) {
+        return { data: entities.map((entity) => this.format(entity)), total };
+    }
 }

@@ -15,4 +15,12 @@ export class User {
             deleted_at: entity.deleted_at,
         };
     }
+
+    public formatMany(entities: Entities.User[]) {
+        return { data: entities.map((entity) => this.format(entity)) };
+    }
+
+    public formatPaginated(entities: Entities.User[], total: number) {
+        return { data: entities.map((entity) => this.format(entity)), total };
+    }
 }

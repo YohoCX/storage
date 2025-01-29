@@ -16,7 +16,8 @@ export class Product {
     @Get()
     @ApiOperation({ summary: 'Get all products' })
     async getAllProducts(@Query() filters: DTOs.Product.Filters, @Query() pagination: DTOs.Pagination) {
-        return this.productPresenter.formatMany(await this.productService.getAllPaginated(pagination.options, filters));
+        const data = await this.productService.getAllPaginated(pagination.options, filters);
+        return this.productPresenter.formatPaginated(data.data, data.total);
     }
 
     @Get(':id')
