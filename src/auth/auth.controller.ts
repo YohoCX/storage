@@ -1,8 +1,6 @@
-import { Decorators } from '@decorators';
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Types } from '@types';
-import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -14,12 +12,5 @@ export class AuthController {
     @Post('login')
     async login(@Body() body: Types.EntityDTO.Auth.Login) {
         return this.authService.login(body);
-    }
-
-    @UseGuards(AuthGuard)
-    @ApiOperation({ summary: 'Get profile' })
-    @Get('profile')
-    async getProfile(@Decorators.CurrentUser() user: Types.EntityDTO.Auth.CachedPayload) {
-        return this.authService.getProfile(user);
     }
 }

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Services } from '@services';
 import { AuthGuard } from '../../auth/auth.guard';
 import { Roles } from '../../decorators/role.decorator';
@@ -23,11 +23,8 @@ export class Category {
 
     @Get()
     @ApiOperation({ summary: 'Get all categories' })
-    @ApiQuery({ type: DTOs.Pagination })
     async getAllCategories(@Query() pagination: DTOs.Pagination) {
-        return this.categoryPresenter.formatMany(
-            await this.categoryService.getAllPaginated(pagination.paginationOptions),
-        );
+        return this.categoryPresenter.formatMany(await this.categoryService.getAllPaginated(pagination.options));
     }
 
     @Post()

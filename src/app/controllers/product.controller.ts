@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Services } from '@services';
 import { AuthGuard } from '../../auth/auth.guard';
 import { DTOs } from '../dtos';
@@ -15,12 +15,8 @@ export class Product {
 
     @Get()
     @ApiOperation({ summary: 'Get all products' })
-    @ApiQuery({ type: DTOs.Product.Filters })
-    @ApiQuery({ type: DTOs.Pagination })
     async getAllProducts(@Query() filters: DTOs.Product.Filters, @Query() pagination: DTOs.Pagination) {
-        return this.productPresenter.formatMany(
-            await this.productService.getAllPaginated(pagination.paginationOptions, filters),
-        );
+        return this.productPresenter.formatMany(await this.productService.getAllPaginated(pagination.options, filters));
     }
 
     @Get(':id')

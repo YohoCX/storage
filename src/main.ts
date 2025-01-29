@@ -1,4 +1,5 @@
 import { Exceptions } from '@exceptions';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -16,6 +17,14 @@ async function bootstrap() {
         methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         origin: '*',
     });
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            transform: true,
+            whitelist: true,
+            forbidNonWhitelisted: true,
+        }),
+    );
 
     const config = new DocumentBuilder()
         .setTitle('API Documentation')

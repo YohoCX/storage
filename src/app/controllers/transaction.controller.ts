@@ -1,6 +1,6 @@
 import { Decorators } from '@decorators';
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Services } from '@services';
 import { Types } from '@types';
 import { AuthGuard } from '../../auth/auth.guard';
@@ -24,11 +24,8 @@ export class Transaction {
 
     @Get()
     @ApiOperation({ summary: 'Get all transactions' })
-    @ApiQuery({ type: DTOs.Pagination })
     async getAllTransactions(@Query() pagination: DTOs.Pagination) {
-        return this.transactionPresenter.formatMany(
-            await this.transactionService.getAllPaginated(pagination.paginationOptions),
-        );
+        return this.transactionPresenter.formatMany(await this.transactionService.getAllPaginated(pagination.options));
     }
 
     @Post('withdraw')
