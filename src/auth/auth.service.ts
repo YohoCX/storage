@@ -43,7 +43,15 @@ export class AuthService {
         await this.cacheManager.set(accessToken, JSON.stringify(payload), 43200000);
 
         return {
-            user: user,
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                email: user.email,
+                state: user.state,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+            },
             access_token: accessToken,
         };
     }
