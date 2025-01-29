@@ -47,11 +47,7 @@ export class Product {
         const raw = await this.prismaService.product.findMany({
             where: {
                 category_id: filters.categoryId,
-                transactions: {
-                    some: {
-                        transaction_id: filters.transactionId,
-                    },
-                },
+                state: 'active',
             },
             skip: pagination.offset,
             take: pagination.limit,

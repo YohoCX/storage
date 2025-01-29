@@ -24,6 +24,9 @@ export class Category {
 
     async getAllPaginated(pagination: Types.PaginationOptions) {
         const raw = await this.prismaService.category.findMany({
+            where: {
+                state: 'active',
+            },
             skip: pagination.offset,
             take: pagination.limit,
         });
@@ -76,9 +79,13 @@ export class Category {
     }
 
     async delete(id: number) {
-        await this.prismaService.category.delete({
+        await this.prismaService.category.update({
             where: {
                 id,
+            },
+            data: {
+                state: 'deleted',
+                deleted_at: new Date(),
             },
         });
     }

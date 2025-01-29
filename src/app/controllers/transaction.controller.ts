@@ -5,24 +5,30 @@ import { Services } from '@services';
 import { Types } from '@types';
 import { AuthGuard } from '../../auth/auth.guard';
 import { DTOs } from '../dtos';
+import { Presenters } from '../presenters';
 
 @Controller('transaction')
 @UseGuards(AuthGuard)
 export class Transaction {
-    constructor(private readonly transactionService: Services.Transaction) {}
+    constructor(
+        private readonly transactionService: Services.Transaction,
+        private readonly transactionPresenter: Presenters.Transaction,
+    ) {}
 
     @Get(':id')
     @ApiOperation({ summary: 'Get transaction by id' })
     @ApiParam({ name: 'id', type: 'number' })
     async getTransactionById(@Param('id', ParseIntPipe) id: number) {
-        return this.transactionService.getById(id);
+        return this.transactionPresenter.format(await this.transactionService.getById(id));
     }
 
     @Get()
     @ApiOperation({ summary: 'Get all transactions' })
     @ApiQuery({ type: DTOs.Pagination })
     async getAllTransactions(@Query() pagination: DTOs.Pagination) {
-        return this.transactionService.getAllPaginated(pagination.paginationOptions);
+        return this.transactionPresenter.formatMany(
+            await this.transactionService.getAllPaginated(pagination.paginationOptions),
+        );
     }
 
     @Post('withdraw')
@@ -32,7 +38,9 @@ export class Transaction {
         @Body() body: DTOs.Transaction.Create,
         @Decorators.CurrentUser() current_user: Types.EntityDTO.Auth.CachedPayload,
     ) {
-        return this.transactionService.performTransaction(body, current_user.id, 'withdraw');
+        return this.transactionPresenter.format(
+            await this.transactionService.performTransaction(body, current_user.id, 'withdraw'),
+        );
     }
 
     @Post('deposit')
@@ -42,7 +50,9 @@ export class Transaction {
         @Body() body: DTOs.Transaction.Create,
         @Decorators.CurrentUser() current_user: Types.EntityDTO.Auth.CachedPayload,
     ) {
-        return this.transactionService.performTransaction(body, current_user.id, 'deposit');
+        return this.transactionPresenter.format(
+            await this.transactionService.performTransaction(body, current_user.id, 'deposit'),
+        );
     }
 
     @Post('refund')
@@ -52,6 +62,8 @@ export class Transaction {
         @Body() body: DTOs.Transaction.Create,
         @Decorators.CurrentUser() current_user: Types.EntityDTO.Auth.CachedPayload,
     ) {
-        return this.transactionService.performTransaction(body, current_user.id, 'refund');
+        return this.transactionPresenter.format(
+            await this.transactionService.performTransaction(body, current_user.id, 'refund'),
+        );
     }
 }

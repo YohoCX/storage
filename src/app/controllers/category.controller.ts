@@ -4,31 +4,37 @@ import { Services } from '@services';
 import { AuthGuard } from '../../auth/auth.guard';
 import { Roles } from '../../decorators/role.decorator';
 import { DTOs } from '../dtos';
+import { Presenters } from '../presenters';
 
 @UseGuards(AuthGuard)
 @Controller('category')
 export class Category {
-    constructor(private readonly categoryService: Services.Category) {}
+    constructor(
+        private readonly categoryService: Services.Category,
+        private readonly categoryPresenter: Presenters.Category,
+    ) {}
 
     @Get(':id')
     @ApiOperation({ summary: 'Get category by id' })
     @ApiParam({ name: 'id', type: 'number' })
     async getCategoryById(@Param('id', ParseIntPipe) id: number) {
-        return this.categoryService.getById(id);
+        return this.categoryPresenter.format(await this.categoryService.getById(id));
     }
 
     @Get()
     @ApiOperation({ summary: 'Get all categories' })
     @ApiQuery({ type: DTOs.Pagination })
     async getAllCategories(@Query() pagination: DTOs.Pagination) {
-        return this.categoryService.getAllPaginated(pagination.paginationOptions);
+        return this.categoryPresenter.formatMany(
+            await this.categoryService.getAllPaginated(pagination.paginationOptions),
+        );
     }
 
     @Post()
     @ApiOperation({ summary: 'Create new category' })
     @ApiBody({ type: DTOs.Category.Create })
     async createCategory(@Body() body: DTOs.Category.Create) {
-        return this.categoryService.create(body);
+        return this.categoryPresenter.format(await this.categoryService.create(body));
     }
 
     @Put(':id')
@@ -36,7 +42,7 @@ export class Category {
     @ApiParam({ name: 'id', type: 'number' })
     @ApiBody({ type: DTOs.Category.Update })
     async updateCategory(@Param('id', ParseIntPipe) id: number, @Body() body: DTOs.Category.Update) {
-        return this.categoryService.update(id, body);
+        return this.categoryPresenter.format(await this.categoryService.update(id, body));
     }
 
     @Delete(':id')

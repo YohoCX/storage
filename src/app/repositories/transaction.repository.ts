@@ -57,29 +57,6 @@ export class Transaction {
         return this.mapRawToEntity(raw);
     }
 
-    public async update(data: Entities.Transaction) {
-        const raw = await this.prismaService.transaction.update({
-            where: {
-                id: data.id,
-            },
-            data: data,
-        });
-
-        return this.mapRawToEntity(raw);
-    }
-
-    public async delete(id: number) {
-        await this.prismaService.transaction.update({
-            where: {
-                id,
-            },
-            data: {
-                state: 'deleted',
-                deleted_at: new Date(),
-            },
-        });
-    }
-
     public async getById(id: number) {
         const raw = await this.prismaService.transaction.findUnique({
             where: {
