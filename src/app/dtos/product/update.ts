@@ -1,15 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ProductType } from '@prisma/client';
 import { Type } from 'class-transformer';
-import {
-    IsEnum,
-    IsInt,
-    IsOptional,
-    IsPositive,
-    IsString,
-    MaxLength,
-    MinLength,
-} from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsPositive, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class Update {
     @ApiPropertyOptional({

@@ -19,9 +19,7 @@ export class AuthController {
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Get profile' })
     @Get('profile')
-    async getProfile(
-        @Decorators.CurrentUser() user: Types.EntityDTO.Auth.CachedPayload,
-    ) {
+    async getProfile(@Decorators.CurrentUser() user: Types.EntityDTO.Auth.CachedPayload) {
         return this.authService.getProfile(user);
     }
 }

@@ -8,10 +8,7 @@ import { DTOs } from '../dtos';
 export class Product {
     constructor(private readonly productRepository: Repositories.Product) {}
 
-    public async getAllPaginated(
-        pagination: Types.PaginationOptions,
-        filters: DTOs.Product.Filters,
-    ) {
+    public async getAllPaginated(pagination: Types.PaginationOptions, filters: DTOs.Product.Filters) {
         return this.productRepository.getAllPaginated(pagination, filters);
     }
 

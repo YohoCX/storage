@@ -17,18 +17,10 @@ export class User {
     }
 
     async create(data: Types.EntityDTO.User.Add) {
-        const hashedPassword = await bcrypt.hash(
-            data.password,
-            this.saltRounds,
-        );
+        const hashedPassword = await bcrypt.hash(data.password, this.saltRounds);
 
         const user = new Entities.User(
-            new Types.EntityDTO.User.Create(
-                data.username,
-                data.email,
-                hashedPassword,
-                data.role,
-            ),
+            new Types.EntityDTO.User.Create(data.username, data.email, hashedPassword, data.role),
         );
 
         return await this.userRepository.createUser(user);

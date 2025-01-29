@@ -13,9 +13,7 @@ export class Product {
     private _updated_at: Date | null;
     private _deleted_at: Date | null;
 
-    public constructor(
-        dto: Types.EntityDTO.Product.Create | Types.EntityDTO.Product.Restore,
-    ) {
+    public constructor(dto: Types.EntityDTO.Product.Create | Types.EntityDTO.Product.Restore) {
         if (dto instanceof Types.EntityDTO.Product.Restore) {
             this._id = dto.id;
             this._created_at = dto.created_at;

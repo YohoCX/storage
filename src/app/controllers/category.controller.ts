@@ -1,15 +1,4 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    ParseIntPipe,
-    Post,
-    Put,
-    Query,
-    UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Services } from '@services';
 import { AuthGuard } from '../../auth/auth.guard';
@@ -32,9 +21,7 @@ export class Category {
     @ApiOperation({ summary: 'Get all categories' })
     @ApiQuery({ type: DTOs.Pagination })
     async getAllCategories(@Query() pagination: DTOs.Pagination) {
-        return this.categoryService.getAllPaginated(
-            pagination.paginationOptions,
-        );
+        return this.categoryService.getAllPaginated(pagination.paginationOptions);
     }
 
     @Post()
@@ -48,10 +35,7 @@ export class Category {
     @ApiOperation({ summary: 'Update category' })
     @ApiParam({ name: 'id', type: 'number' })
     @ApiBody({ type: DTOs.Category.Update })
-    async updateCategory(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() body: DTOs.Category.Update,
-    ) {
+    async updateCategory(@Param('id', ParseIntPipe) id: number, @Body() body: DTOs.Category.Update) {
         return this.categoryService.update(id, body);
     }
 

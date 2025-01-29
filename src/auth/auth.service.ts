@@ -16,10 +16,7 @@ export class AuthService {
         const user = await this.userService.getByUsername(username);
 
         if (user) {
-            const isPasswordMatching = await bcrypt.compare(
-                password,
-                user.password,
-            );
+            const isPasswordMatching = await bcrypt.compare(password, user.password);
             if (isPasswordMatching) {
                 return user;
             }
@@ -43,11 +40,7 @@ export class AuthService {
 
         const accessToken = randomUUID();
 
-        await this.cacheManager.set(
-            accessToken,
-            JSON.stringify(payload),
-            43200000,
-        );
+        await this.cacheManager.set(accessToken, JSON.stringify(payload), 43200000);
 
         return {
             access_token: accessToken,

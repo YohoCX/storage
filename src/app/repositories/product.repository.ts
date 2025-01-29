@@ -8,9 +8,7 @@ import { DTOs } from '../dtos';
 
 @Injectable()
 export class Product {
-    constructor(
-        private readonly prismaService: External.Prisma.PrismaService,
-    ) {}
+    constructor(private readonly prismaService: External.Prisma.PrismaService) {}
 
     private mapRawToEntity(raw: PrismaProduct): Entities.Product {
         return new Entities.Product(
@@ -45,10 +43,7 @@ export class Product {
         return raw.map((r) => this.mapRawToEntity(r));
     }
 
-    public async getAllPaginated(
-        pagination: Types.PaginationOptions,
-        filters: DTOs.Product.Filters,
-    ) {
+    public async getAllPaginated(pagination: Types.PaginationOptions, filters: DTOs.Product.Filters) {
         const raw = await this.prismaService.product.findMany({
             where: {
                 category_id: filters.categoryId,

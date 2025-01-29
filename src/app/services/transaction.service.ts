@@ -1,15 +1,15 @@
 import { Entities } from '@entities';
 import { Injectable } from '@nestjs/common';
 import { Repositories } from '@repositories';
-import { Services } from '@services';
 import { Types } from '@types';
 import { DTOs } from '../dtos';
+import { Product } from './services';
 
 @Injectable()
 export class Transaction {
     constructor(
         private readonly transactionService: Repositories.Transaction,
-        private readonly productService: Services.Product,
+        private readonly productService: Product,
     ) {}
 
     public async getAllPaginated(pagination: Types.PaginationOptions) {
@@ -25,15 +25,10 @@ export class Transaction {
         user_id: string,
         type: 'withdraw' | 'deposit' | 'refund',
     ) {
-        const products = await this.productService.getAllByIds(
-            data.items.map((item) => item.product_id),
-        );
+        const products = await this.productService.getAllByIds(data.items.map((item) => item.product_id));
 
         for (const product of products) {
-            product[type](
-                data.items.find((item) => item.product_id === product.id)
-                    .amount,
-            );
+            product[type](data.items.find((item) => item.product_id === product.id).amount);
         }
 
         const transaction = await this.transactionService.create(
@@ -51,9 +46,7 @@ export class Transaction {
         const transactionItems = products.map((product) => {
             return {
                 product_id: product.id,
-                quantity: data.items.find(
-                    (item) => item.product_id === product.id,
-                ).amount,
+                quantity: data.items.find((item) => item.product_id === product.id).amount,
                 transaction_id: transaction.id,
             };
         });

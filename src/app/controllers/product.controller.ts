@@ -1,15 +1,4 @@
-import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    ParseIntPipe,
-    Post,
-    Put,
-    Query,
-    UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Services } from '@services';
 import { AuthGuard } from '../../auth/auth.guard';
@@ -24,14 +13,8 @@ export class Product {
     @ApiOperation({ summary: 'Get all products' })
     @ApiQuery({ type: DTOs.Product.Filters })
     @ApiQuery({ type: DTOs.Pagination })
-    async getAllProducts(
-        @Query() filters: DTOs.Product.Filters,
-        @Query() pagination: DTOs.Pagination,
-    ) {
-        return this.productService.getAllPaginated(
-            pagination.paginationOptions,
-            filters,
-        );
+    async getAllProducts(@Query() filters: DTOs.Product.Filters, @Query() pagination: DTOs.Pagination) {
+        return this.productService.getAllPaginated(pagination.paginationOptions, filters);
     }
 
     @Get(':id')
@@ -52,10 +35,7 @@ export class Product {
     @ApiOperation({ summary: 'Update product' })
     @ApiBody({ type: DTOs.Product.Update })
     @ApiParam({ name: 'id', type: 'number' })
-    async updateProduct(
-        @Body() body: DTOs.Product.Update,
-        @Param('id', ParseIntPipe) id: number,
-    ) {
+    async updateProduct(@Body() body: DTOs.Product.Update, @Param('id', ParseIntPipe) id: number) {
         return this.productService.update(id, body);
     }
 

@@ -7,13 +7,7 @@ export class Create {
     private readonly _role: Role;
     private readonly _state: EntityState;
 
-    public constructor(
-        username: string,
-        email: string,
-        password: string,
-        role: Role,
-        state: EntityState = 'active',
-    ) {
+    public constructor(username: string, email: string, password: string, role: Role, state: EntityState = 'active') {
         this._username = username;
         this._email = email;
         this._password = password;

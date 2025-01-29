@@ -22,17 +22,17 @@ export class AuthGuard implements CanActivate {
             throw new UnauthorizedException();
         }
 
-        const user: Types.EntityDTO.Auth.CachedPayload = JSON.parse(
-            await this.cacheManager.get(token),
-        );
+        const user: Types.EntityDTO.Auth.CachedPayload = JSON.parse(await this.cacheManager.get(token));
 
         if (!user) {
             throw new UnauthorizedException();
         }
 
         const requiredRole = this.getRequiredRole(context);
-        if (requiredRole.length && !requiredRole.includes(user.role)) {
-            throw new ForbiddenException();
+        if (requiredRole) {
+            if (requiredRole.length && !requiredRole.includes(user.role)) {
+                throw new ForbiddenException();
+            }
         }
 
         return true;

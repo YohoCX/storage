@@ -13,9 +13,7 @@ export class User {
     private readonly _updated_at: Date | null;
     private readonly _deleted_at: Date | null;
 
-    constructor(
-        dto: Types.EntityDTO.User.Create | Types.EntityDTO.User.Restore,
-    ) {
+    constructor(dto: Types.EntityDTO.User.Create | Types.EntityDTO.User.Restore) {
         if (dto instanceof Types.EntityDTO.User.Restore) {
             this._id = dto.id;
             this._created_at = dto.created_at;

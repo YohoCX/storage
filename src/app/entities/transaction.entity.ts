@@ -12,11 +12,7 @@ export class Transaction {
     private readonly _updated_at: Date | null;
     private readonly _deleted_at: Date | null;
 
-    public constructor(
-        dto:
-            | Types.EntityDTO.Transaction.Create
-            | Types.EntityDTO.Transaction.Restore,
-    ) {
+    public constructor(dto: Types.EntityDTO.Transaction.Create | Types.EntityDTO.Transaction.Restore) {
         if (dto instanceof Types.EntityDTO.Transaction.Restore) {
             this._id = dto.id;
             this._created_at = dto.created_at;

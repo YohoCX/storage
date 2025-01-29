@@ -20,6 +20,7 @@ import { ContextInterceptor } from './interceptors/context.interceptor';
         }),
         Modules.Category,
         Modules.Product,
+        Modules.Transaction,
         Modules.User,
     ],
     controllers: [],

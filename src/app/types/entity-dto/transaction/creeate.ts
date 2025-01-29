@@ -7,13 +7,7 @@ export class Create {
     private readonly _type: TransactionType;
     private readonly _state: EntityState;
 
-    constructor(
-        user_id: string,
-        customer: string,
-        customer_phone: string,
-        type: TransactionType,
-        state: EntityState,
-    ) {
+    constructor(user_id: string, customer: string, customer_phone: string, type: TransactionType, state: EntityState) {
         this._user_id = user_id;
         this._customer = customer;
         this._customer_phone = customer_phone;

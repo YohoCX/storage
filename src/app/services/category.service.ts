@@ -10,11 +10,7 @@ export class Category {
 
     public async create(dto: DTOs.Category.Create) {
         const category = new Entities.Category(
-            new Types.EntityDTO.Category.Create(
-                dto.name,
-                dto.description ? dto.description : null,
-                'active',
-            ),
+            new Types.EntityDTO.Category.Create(dto.name, dto.description ? dto.description : null, 'active'),
         );
 
         return this.categoryRepository.create(category);

@@ -6,9 +6,7 @@ import { Types } from '@types';
 
 @Injectable()
 export class Transaction {
-    constructor(
-        private readonly prismaService: External.Prisma.PrismaService,
-    ) {}
+    constructor(private readonly prismaService: External.Prisma.PrismaService) {}
 
     private mapRawToEntity(raw: PrismaTransaction): Entities.Transaction {
         return new Entities.Transaction(
