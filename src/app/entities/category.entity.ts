@@ -20,6 +20,7 @@ export class Category {
 
         this._name = dto.name;
         this._description = dto.description;
+        this._state = dto.state;
     }
 
     public get id(): number {

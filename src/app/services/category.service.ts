@@ -37,7 +37,7 @@ export class Category {
 
     public async delete(id: number) {
         const category = await this.getById(id);
-        if (category.state !== 'active') {
+        if (category.state === 'active') {
             throw new BadRequestException({
                 message: 'category is already deleted',
             });

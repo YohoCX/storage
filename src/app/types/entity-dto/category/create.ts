@@ -5,7 +5,7 @@ export class Create {
     private readonly _description: string | null;
     private readonly _state: EntityState;
 
-    public constructor(name: string, description: string | null, entityState: EntityState = 'active') {
+    public constructor(name: string, description: string | null, entityState: EntityState) {
         this._name = name;
         this._description = description;
         this._state = entityState;
