@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  username String @unique
+  role     Role
+  password String
+
+  state      EntityState
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  deleted_at DateTime?
+
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  category_id Int
+  name        String
+  description String?
+  total       Decimal?
+  type        ProductType
+
+  state      EntityState
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  deleted_at DateTime?
+
+  transactions TransactionItems[]
+  category     Category           @relation(fields: [category_id], references: [id])
+
+  @@map("products")
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  state      EntityState
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  deleted_at DateTime?
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Transaction {
+  id      Int    @id @default(autoincrement())
+  user_id String
+  user    User   @relation(fields: [user_id], references: [id])
+
+  customer       String
+  customer_phone String
+  type           TransactionType
+
+  state      EntityState
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  deleted_at DateTime?
+
+  transaction_items TransactionItems[]
+
+  @@map("transactions")
+}
+
+model TransactionItems {
+  id             Int         @id @default(autoincrement())
+  transaction_id Int
+  transaction    Transaction @relation(fields: [transaction_id], references: [id])
+  product_id     Int
+  product        Product     @relation(fields: [product_id], references: [id])
+  quantity       Float
+
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@map("transaction_items")
+}
+
+enum Role {
+  admin
+  moderator
+
+  @@map("roles")
+}
+
+enum TransactionType {
+  deposit
+  withdraw
+  refund
+
+  @@map("transaction_types")
+}
+
+enum ProductType {
+  continuous
+  discrete
+
+  @@map("product_types")
+}
+
+enum EntityState {
+  active
+  deleted
+
+  @@map("entity_states")
+}
