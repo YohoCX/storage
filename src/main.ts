@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { validate } from 'class-validator';
 import * as process from 'node:process';
 import { AppModule } from './app.module';
 
@@ -22,7 +23,9 @@ async function bootstrap() {
         new ValidationPipe({
             transform: true,
             whitelist: true,
-            forbidNonWhitelisted: true,
+            validatorPackage: {
+                validate,
+            },
         }),
     );
 
