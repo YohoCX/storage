@@ -1,8 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsObject, IsString, MaxLength, MinLength } from 'class-validator';
 import { Item } from './item';
 
+@ApiSchema({ name: 'Transaction Create' })
 export class Create {
     @ApiProperty({
         type: String,

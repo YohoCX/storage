@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { IsString, MaxLength } from 'class-validator';
 
+@ApiSchema({ name: 'Category Update' })
 export class Update {
     @ApiProperty({
         description: 'Category description',

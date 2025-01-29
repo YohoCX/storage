@@ -62,7 +62,14 @@ export class Product {
 
     public async create(data: Entities.Product) {
         const raw = await this.prismaService.product.create({
-            data: data,
+            data: {
+                category_id: data.category_id,
+                name: data.name,
+                description: data.description,
+                total: data.total,
+                type: data.type,
+                state: 'active',
+            },
         });
 
         return this.mapRawToEntity(raw);

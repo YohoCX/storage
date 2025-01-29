@@ -51,7 +51,13 @@ export class Transaction {
 
     public async create(data: Entities.Transaction) {
         const raw = await this.prismaService.transaction.create({
-            data: data,
+            data: {
+                user_id: data.user_id,
+                customer: data.customer,
+                customer_phone: data.customer_phone,
+                type: data.type,
+                state: 'active',
+            },
         });
 
         return this.mapRawToEntity(raw);

@@ -43,7 +43,7 @@ export class Category {
             data: {
                 name: entity.name,
                 description: entity.description,
-                state: entity.state,
+                state: 'active',
             },
         });
 

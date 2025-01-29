@@ -1,7 +1,8 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, ApiSchema } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional } from 'class-validator';
 
+@ApiSchema({ name: 'Product Filters' })
 export class Filters {
     @ApiPropertyOptional({
         description: 'Category Id',
