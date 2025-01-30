@@ -4,6 +4,7 @@ import { Services } from '@services';
 import { Types } from '@types';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
+import { FastifyReply } from 'fastify';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +26,7 @@ export class AuthService {
         return null;
     }
 
-    async login(dto: Types.EntityDTO.Auth.Login) {
+    async login(dto: Types.EntityDTO.Auth.Login, reply: FastifyReply) {
         const user = await this.validateUser(dto.username, dto.password);
 
         if (!user) {
@@ -42,18 +43,26 @@ export class AuthService {
 
         await this.cacheManager.set(accessToken, JSON.stringify(payload), 43200000);
 
-        return {
-            user: {
-                id: user.id,
-                username: user.username,
-                role: user.role,
-                email: user.email,
-                state: user.state,
-                created_at: user.created_at,
-                updated_at: user.updated_at,
-            },
-            access_token: accessToken,
-        };
+        reply
+            .setCookie('token', accessToken, {
+                domain: 'api.yohocx.store', // Make sure this matches your API domain
+                path: '/',
+                httpOnly: true,
+                secure: true, // Only works over HTTPS
+                sameSite: 'none', // Required for cross-origin cookies
+            })
+            .send({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    role: user.role,
+                    email: user.email,
+                    state: user.state,
+                    created_at: user.created_at,
+                    updated_at: user.updated_at,
+                },
+                access_token: accessToken,
+            });
     }
 
     async getProfile(cached_user: Types.EntityDTO.Auth.CachedPayload) {
