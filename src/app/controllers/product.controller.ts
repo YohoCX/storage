@@ -34,7 +34,7 @@ export class Product {
         return this.productPresenter.format(await this.productService.create(body));
     }
 
-    @Put('id')
+    @Put(':id')
     @ApiOperation({ summary: 'Update product' })
     @ApiBody({ type: DTOs.Product.Update })
     @ApiParam({ name: 'id', type: 'number' })
