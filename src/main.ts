@@ -13,17 +13,19 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
+    const allowedOrigins = ['http://localhost:3030', 'http://localhost:3000']; // Add Swagger UI origin
+
     app.enableCors({
-        allowedHeaders: 'Content-Type, Authorization',
-        methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         origin: (origin, callback) => {
-            if (origin) {
-                callback(null, true); // Allow all origins
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
             } else {
                 callback(new Error('Not allowed by CORS'), false);
             }
         },
         credentials: true,
+        allowedHeaders: 'Content-Type, Authorization',
+        methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
     });
 
     app.useGlobalPipes(
