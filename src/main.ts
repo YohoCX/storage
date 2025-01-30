@@ -30,16 +30,18 @@ async function bootstrap() {
     );
 
     const config = new DocumentBuilder()
-        .setTitle('API Documentation')
-        .setDescription('The API description')
+        .setTitle('Storage API')
+        .setDescription('API Documentation for Storage API')
         .setVersion('1.0')
-        .addBearerAuth({
-            type: 'http',
-            scheme: 'bearer',
-        })
+        .addCookieAuth('token')
         .build();
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('swagger', app, document);
+    SwaggerModule.setup('api/v1/docs', app, document, {
+        swaggerOptions: {
+            tagsSorter: 'alpha',
+            operationsSorter: 'alpha',
+        },
+    });
 
     const port = process.env.PORT || 3000;
     await app.listen(port);

@@ -18,7 +18,7 @@ export class ContextInterceptor implements NestInterceptor {
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
         const request = context.switchToHttp().getRequest();
         try {
-            const token = request.headers.authorization;
+            const token = request.cookies.token;
             request.user = await this.authService.getUser(token);
         } catch (error) {
             if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
