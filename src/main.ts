@@ -14,9 +14,10 @@ async function bootstrap() {
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
     app.enableCors({
-        allowedHeaders: 'Content-Type, Authorization',
+        allowedHeaders: 'Content-Type',
         methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         origin: '*',
+        credentials: true,
     });
 
     app.useGlobalPipes(
