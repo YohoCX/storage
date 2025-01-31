@@ -93,7 +93,14 @@ export class Product {
             where: {
                 id: data.id,
             },
-            data: data,
+            data: {
+                category_id: data.category_id,
+                name: data.name,
+                description: data.description,
+                total: data.total,
+                type: data.type,
+                updated_at: new Date(),
+            },
         });
 
         return this.mapRawToEntity(raw);
