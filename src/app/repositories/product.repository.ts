@@ -133,13 +133,20 @@ export class Product {
     }
 
     public async updateMany(data: Entities.Product[]) {
-        return await this.prismaService.product.updateMany({
-            where: {
-                id: {
-                    in: data.map((d) => d.id),
+        for (const product of data) {
+            await this.prismaService.product.update({
+                where: {
+                    id: product.id,
                 },
-            },
-            data: data,
-        });
+                data: {
+                    category_id: product.category_id,
+                    name: product.name,
+                    description: product.description,
+                    total: product.total,
+                    type: product.type,
+                    updated_at: new Date(),
+                },
+            });
+        }
     }
 }
