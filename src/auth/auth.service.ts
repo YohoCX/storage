@@ -45,11 +45,11 @@ export class AuthService {
 
         reply
             .setCookie('token', accessToken, {
-                domain: 'api.yohocx.store', // Make sure this matches your API domain
+                domain: 'api.yohocx.store',
                 path: '/',
                 httpOnly: true,
-                secure: true, // Only works over HTTPS
-                sameSite: 'none', // Required for cross-origin cookies
+                secure: true,
+                sameSite: 'none',
             })
             .send({
                 user: {

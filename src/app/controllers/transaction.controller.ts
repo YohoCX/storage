@@ -1,5 +1,5 @@
 import { Decorators } from '@decorators';
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Services } from '@services';
 import { Types } from '@types';
@@ -23,45 +23,103 @@ export class Transaction {
     }
 
     @Get()
-    @ApiOperation({ summary: 'Get all transactions' })
-    async getAllTransactions(@Query() pagination: DTOs.Pagination) {
+    @ApiOperation({ summary: 'Get all transactions paginated' })
+    async getTransactionsPaginated(@Query() pagination: DTOs.Pagination) {
         const data = await this.transactionService.getAllPaginated(pagination.options);
         return this.transactionPresenter.formatPaginated(data.data, data.total);
     }
 
-    @Post('withdraw')
-    @ApiOperation({ summary: 'Withdraw transaction' })
-    @ApiBody({ type: DTOs.Transaction.Create })
-    async withdraw(
-        @Body() body: DTOs.Transaction.Create,
-        @Decorators.CurrentUser() current_user: Types.EntityDTO.Auth.CachedPayload,
-    ) {
-        return this.transactionPresenter.format(
-            await this.transactionService.performTransaction(body, current_user.id, 'withdraw'),
-        );
+    @Get(':id/items')
+    @ApiOperation({ summary: 'Get transaction items by transaction id' })
+    @ApiParam({ name: 'id', type: 'number' })
+    async getTransactionItems(@Param('id', ParseIntPipe) id: number) {
+        return this.transactionService.getTransactionItems(id);
     }
 
-    @Post('deposit')
-    @ApiOperation({ summary: 'Deposit transaction' })
+    @Post()
+    @ApiOperation({ summary: 'Create transaction' })
     @ApiBody({ type: DTOs.Transaction.Create })
-    async deposit(
+    async create(
         @Body() body: DTOs.Transaction.Create,
         @Decorators.CurrentUser() current_user: Types.EntityDTO.Auth.CachedPayload,
     ) {
-        return this.transactionPresenter.format(
-            await this.transactionService.performTransaction(body, current_user.id, 'deposit'),
-        );
+        return this.transactionPresenter.format(await this.transactionService.create(body, current_user.id));
     }
 
-    @Post('refund')
-    @ApiOperation({ summary: 'Refund transaction' })
-    @ApiBody({ type: DTOs.Transaction.Create })
-    async refund(
-        @Body() body: DTOs.Transaction.Create,
-        @Decorators.CurrentUser() current_user: Types.EntityDTO.Auth.CachedPayload,
+    @Post(':id/add-product')
+    @ApiOperation({ summary: 'Add product to transaction' })
+    @ApiBody({ type: DTOs.Transaction.TransactionProduct })
+    async addProductToTransaction(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() body: DTOs.Transaction.TransactionProduct,
     ) {
-        return this.transactionPresenter.format(
-            await this.transactionService.performTransaction(body, current_user.id, 'refund'),
-        );
+        await this.transactionService.createCartItem(body, id);
+
+        return {
+            message: 'Success',
+        };
+    }
+
+    @Post(':id/update-product')
+    @ApiOperation({ summary: 'Update product in transaction' })
+    @ApiBody({ type: DTOs.Transaction.TransactionProduct })
+    async updateProductInTransaction(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() body: DTOs.Transaction.TransactionProduct,
+    ) {
+        await this.transactionService.updateCartItem(body, id);
+
+        return {
+            message: 'Success',
+        };
+    }
+
+    @Post(':id/remove-product/:product_id')
+    @ApiOperation({ summary: 'Remove product from transaction' })
+    @ApiParam({ name: 'id', type: 'number' })
+    @ApiParam({ name: 'product_id', type: 'number' })
+    async removeProductFromTransaction(
+        @Param('id', ParseIntPipe) id: number,
+        @Param('product_id', ParseIntPipe) product_id: number,
+    ) {
+        await this.transactionService.removeCartItem(id, product_id);
+
+        return {
+            message: 'Success',
+        };
+    }
+
+    @Post(':id/finalize')
+    @ApiOperation({ summary: 'Finalize transaction' })
+    @ApiParam({ name: 'id', type: 'number' })
+    @ApiBody({ type: DTOs.Transaction.AddProducts })
+    async finalizeTransaction(@Param('id', ParseIntPipe) id: number, @Body() body: DTOs.Transaction.AddProducts) {
+        await this.transactionService.finalizeCartToWithdraw(body, id);
+
+        return {
+            message: 'Success',
+        };
+    }
+
+    @Post(':id/perform')
+    @ApiOperation({ summary: 'Perform transaction' })
+    @ApiParam({ name: 'id', type: 'number' })
+    async performTransaction(@Param('id', ParseIntPipe) id: number) {
+        await this.transactionService.performTransaction(id);
+
+        return {
+            message: 'Success',
+        };
+    }
+
+    @Delete(':id')
+    @ApiOperation({ summary: 'Cancel transaction' })
+    @ApiParam({ name: 'id', type: 'number' })
+    async cancelTransaction(@Param('id', ParseIntPipe) id: number) {
+        await this.transactionService.cancelTransaction(id);
+
+        return {
+            message: 'Success',
+        };
     }
 }

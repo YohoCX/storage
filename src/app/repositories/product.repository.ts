@@ -1,9 +1,8 @@
 import { Entities } from '@entities';
 import { External } from '@external';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Product as PrismaProduct } from '@prisma/client';
 import { Types } from '@types';
-import { NotFoundError } from 'rxjs';
 import { DTOs } from '../dtos';
 
 @Injectable()
@@ -114,14 +113,14 @@ export class Product {
         });
 
         if (!raw) {
-            throw new NotFoundError('Product not found');
+            throw new HttpException('Product not found', 404);
         }
 
         return this.mapRawToEntity(raw);
     }
 
     public async delete(id: number) {
-        return await this.prismaService.product.update({
+        await this.prismaService.product.update({
             where: {
                 id,
             },
@@ -148,5 +147,24 @@ export class Product {
                 },
             });
         }
+    }
+
+    public async updateManyQuantity(
+        data: {
+            id: number;
+            total: number;
+        }[],
+    ) {
+        await this.prismaService.$transaction(
+            data.map(( product ) =>
+                this.prismaService.product.update({
+                    where: { id: product.id },
+                    data: {
+                        total: product.total,
+                        updated_at: new Date(),
+                    },
+                }),
+            ),
+        );
     }
 }

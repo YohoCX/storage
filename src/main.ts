@@ -13,13 +13,14 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
-    const allowedOrigins = ['http://localhost:3030', 'http://localhost:3000']; // Add Swagger UI origin
+    const allowedOrigins = ['http://127.0.0.1:3030', 'http://127.0.0.1:3000'];
 
     app.enableCors({
         origin: (origin, callback) => {
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
+                console.log(origin);
                 callback(new Error('Not allowed by CORS'), false);
             }
         },
@@ -53,7 +54,7 @@ async function bootstrap() {
     });
 
     const port = process.env.PORT || 3000;
-    await app.listen(port);
+    await app.listen(port, '0.0.0.0');
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
 

@@ -20,6 +20,13 @@ export class Product {
         return this.productPresenter.formatPaginated(data.data, data.total);
     }
 
+    @Get('search')
+    @ApiOperation({ summary: 'Search products' })
+    @ApiParam({ name: 'query', type: 'string' })
+    async searchProducts(@Query('query') query: string) {
+        return this.productService.search(query);
+    }
+
     @Get(':id')
     @ApiOperation({ summary: 'Get product by id' })
     @ApiParam({ name: 'id', type: 'number' })

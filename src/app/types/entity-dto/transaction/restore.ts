@@ -1,4 +1,4 @@
-import { EntityState, TransactionType } from '@prisma/client';
+import { TransactionStatus, TransactionType } from '@prisma/client';
 import { Create } from './creeate';
 
 export class Restore extends Create {
@@ -13,7 +13,7 @@ export class Restore extends Create {
         customer: string,
         customer_phone: string,
         type: TransactionType,
-        state: EntityState,
+        state: TransactionStatus,
         created_at: Date,
         updated_at: Date | null,
         deleted_at: Date | null,

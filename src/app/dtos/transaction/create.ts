@@ -1,7 +1,6 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsObject, IsString, MaxLength, MinLength } from 'class-validator';
-import { Item } from './item';
+import { TransactionType } from '@prisma/client';
+import { IsEnum, IsString, MaxLength, MinLength } from 'class-validator';
 
 @ApiSchema({ name: 'Transaction Create' })
 export class Create {
@@ -26,11 +25,11 @@ export class Create {
     customer_phone!: string;
 
     @ApiProperty({
-        type: [Item],
-        description: 'Items',
-        example: [{ product_id: 1, amount: 1 }],
+        type: String,
+        description: 'Transaction type',
+        example: 'deposit',
+        enum: ['deposit', 'withdraw', 'refund'],
     })
-    @IsObject({ each: true })
-    @Type(() => Item)
-    items: Item[];
+    @IsEnum(TransactionType)
+    type!: TransactionType;
 }

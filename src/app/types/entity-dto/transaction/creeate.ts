@@ -1,13 +1,19 @@
-import { EntityState, TransactionType } from '@prisma/client';
+import { TransactionStatus, TransactionType } from '@prisma/client';
 
 export class Create {
     private readonly _user_id: string;
     private readonly _customer: string;
     private readonly _customer_phone: string;
     private readonly _type: TransactionType;
-    private readonly _state: EntityState;
+    private readonly _state: TransactionStatus;
 
-    constructor(user_id: string, customer: string, customer_phone: string, type: TransactionType, state: EntityState) {
+    constructor(
+        user_id: string,
+        customer: string,
+        customer_phone: string,
+        type: TransactionType,
+        state: TransactionStatus,
+    ) {
         this._user_id = user_id;
         this._customer = customer;
         this._customer_phone = customer_phone;
@@ -31,7 +37,7 @@ export class Create {
         return this._type;
     }
 
-    public get state(): EntityState {
+    public get state(): TransactionStatus {
         return this._state;
     }
 }

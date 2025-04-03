@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { IsDecimal, IsInt, IsPositive } from 'class-validator';
 
 @ApiSchema({ name: 'Transaction Item' })
-export class Item {
+export class TransactionProduct {
     @ApiProperty({
         type: Number,
         description: 'Product ID',

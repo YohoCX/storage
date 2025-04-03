@@ -1,4 +1,4 @@
-import { EntityState, TransactionType } from '@prisma/client';
+import { TransactionStatus, TransactionType } from '@prisma/client';
 import { Types } from '@types';
 
 export class Transaction {
@@ -7,7 +7,7 @@ export class Transaction {
     private readonly _customer: string;
     private readonly _customer_phone: string;
     private readonly _type: TransactionType;
-    private readonly _state: EntityState;
+    private readonly _state: TransactionStatus;
     private readonly _created_at: Date;
     private readonly _updated_at: Date | null;
     private readonly _deleted_at: Date | null;
@@ -46,7 +46,7 @@ export class Transaction {
         return this._type;
     }
 
-    public get state(): EntityState {
+    public get state(): TransactionStatus {
         return this._state;
     }
 

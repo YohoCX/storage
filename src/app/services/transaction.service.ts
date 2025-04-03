@@ -1,5 +1,6 @@
 import { Entities } from '@entities';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { EntityState } from '@prisma/client';
 import { Repositories } from '@repositories';
 import { Types } from '@types';
 import { DTOs } from '../dtos';
@@ -8,53 +9,183 @@ import { Product } from './services';
 @Injectable()
 export class Transaction {
     constructor(
-        private readonly transactionService: Repositories.Transaction,
+        private readonly transactionRepository: Repositories.Transaction,
         private readonly productService: Product,
     ) {}
 
     public async getAllPaginated(pagination: Types.PaginationOptions) {
-        return this.transactionService.getAllPaginated(pagination);
+        return this.transactionRepository.getAllPaginated(pagination);
     }
 
     public async getById(id: number) {
-        return this.transactionService.getById(id);
+        return this.transactionRepository.getById(id);
     }
 
-    public async performTransaction(
-        data: DTOs.Transaction.Create,
-        user_id: string,
-        type: 'withdraw' | 'deposit' | 'refund',
-    ) {
-        const products = await this.productService.getAllByIds(data.items.map((item) => item.product_id));
+    public async create(data: DTOs.Transaction.Create, user_id: string) {
+        const userHasActiveTransaction = await this.transactionRepository.userHasActiveTransaction(user_id);
 
-        for (const product of products) {
-            product[type](data.items.find((item) => item.product_id === product.id).amount);
+        if (userHasActiveTransaction) {
+            throw new HttpException(
+                'User has an active transaction already, to create new either complete or cancel pending transaction',
+                400,
+            );
         }
 
-        const transaction = await this.transactionService.create(
+        return await this.transactionRepository.create(
             new Entities.Transaction(
                 new Types.EntityDTO.Transaction.Create(
                     user_id,
                     data.customer_name,
                     data.customer_phone,
-                    type,
-                    'active',
+                    data.type,
+                    'pending',
                 ),
             ),
         );
+    }
 
-        const transactionItems = products.map((product) => {
-            return {
-                product_id: product.id,
-                quantity: data.items.find((item) => item.product_id === product.id).amount,
-                transaction_id: transaction.id,
-            };
+    public async getTransactionItems(transaction_id: number) {
+        const transaction = await this.transactionRepository.getById(transaction_id);
+
+        return await this.transactionRepository.getItemsByTransactionId(transaction.id);
+    }
+
+    public async cancelTransaction(transaction_id: number) {
+        const transaction = await this.transactionRepository.getById(transaction_id);
+
+        if (transaction.state !== 'pending') {
+            throw new HttpException('Transaction is completed', 400);
+        }
+
+        await this.transactionRepository.cancelTransaction(transaction_id);
+    }
+
+    public async createCartItem(data: DTOs.Transaction.TransactionProduct, transaction_id: number) {
+        const transaction = await this.transactionRepository.getById(transaction_id);
+        if (transaction.state !== 'pending') {
+            throw new HttpException('Transaction is completed', 400);
+        }
+
+        const existingProduct = await this.transactionRepository.getTransactionItemByProductId(
+            transaction_id,
+            data.product_id,
+        );
+
+        if (existingProduct) {
+            throw new HttpException('Product already in cart', 400);
+        }
+
+        const product = await this.productService.getById(data.product_id);
+        if (product.total < data.amount) {
+            throw new HttpException('Not enough stock', 400);
+        }
+
+        await this.transactionRepository.createTransactionItem({
+            transaction_id,
+            product_id: data.product_id,
+            quantity: data.amount,
         });
+    }
 
-        await this.transactionService.createTransactionItems(transactionItems);
+    public async updateCartItem(data: DTOs.Transaction.TransactionProduct, transaction_id: number) {
+        const transaction = await this.transactionRepository.getById(transaction_id);
+        if (transaction.state !== 'pending') {
+            throw new HttpException('Transaction is completed', 400);
+        }
 
-        await this.productService.updateMany(products);
+        const existingProduct = await this.transactionRepository.getTransactionItemByProductId(
+            transaction_id,
+            data.product_id,
+        );
 
-        return transaction;
+        if (!existingProduct) {
+            throw new HttpException('Product not found in cart', 400);
+        }
+
+        if (transaction.type === 'withdraw') {
+            const product = await this.productService.getById(data.product_id);
+            if (product.total < data.amount) {
+                throw new HttpException('Not enough stock', 400);
+            }
+        }
+
+        await this.transactionRepository.updateTransactionItem(existingProduct.id, data.amount);
+    }
+
+    public async removeCartItem(product_id: number, transaction_id: number) {
+        const transaction = await this.transactionRepository.getById(transaction_id);
+        if (transaction.state !== 'pending') {
+            throw new HttpException('Transaction is completed', 400);
+        }
+
+        const existingProduct = await this.transactionRepository.getTransactionItemByProductId(
+            transaction_id,
+            product_id,
+        );
+
+        if (!existingProduct) {
+            throw new HttpException('Product not found in cart', 400);
+        }
+
+        await this.transactionRepository.removeTransactionItem(existingProduct.id);
+    }
+
+    public async finalizeCartToWithdraw(data: DTOs.Transaction.AddProducts, transaction_id: number) {
+        const transaction = await this.transactionRepository.getById(transaction_id);
+        if (transaction.state !== 'pending') {
+            throw new HttpException('Transaction is completed', 400);
+        }
+
+        const products = await this.productService.getAllByIds(data.products.map((p) => p.product_id));
+        const existingProducts = await this.transactionRepository.getItemsByTransactionId(transaction_id);
+
+        const productsToAdd = products
+            .filter((p) => {
+                const existingProduct = existingProducts.find((ep) => ep.product_id === p.id);
+                return !existingProduct && p.total >= data.products.find((dp) => dp.product_id === p.id).amount;
+            })
+            .map((p) => {
+                return {
+                    transaction_id,
+                    product_id: p.id,
+                    quantity: data.products.find((dp) => dp.product_id === p.id).amount,
+                    state: 'active' satisfies EntityState,
+                };
+            });
+
+        const productsToUpdate = existingProducts
+            .filter((ep) => {
+                return products.find((p) => p.id === ep.product_id);
+            })
+            .map((ep) => {
+                const quantity = data.products.find((dp) => dp.product_id === ep.product_id).amount;
+                if (quantity > products.find((p) => p.id === ep.product_id).total) {
+                    throw new HttpException(`Not enough stock, product_id: ${ep.product_id}`, 400);
+                }
+                return {
+                    transaction_item_id: ep.id,
+                    quantity,
+                };
+            });
+
+        const productsToRemove = existingProducts
+            .filter((ep) => {
+                return !products.find((p) => p.id === ep.product_id);
+            })
+            .map((ep) => {
+                return ep.id;
+            });
+
+        await this.transactionRepository.createTransactionItems(productsToAdd);
+        await this.transactionRepository.updateTransactionItems(productsToUpdate);
+        await this.transactionRepository.removeTransactionItems(productsToRemove);
+    }
+
+    public async performTransaction(transaction_id: number) {
+        const items = await this.transactionRepository.getItemsByTransactionId(transaction_id);
+
+        await this.productService.updateQuantity(items);
+
+        await this.transactionRepository.performTransaction(transaction_id);
     }
 }

@@ -5,6 +5,9 @@ CREATE TYPE "roles" AS ENUM ('admin', 'moderator');
 CREATE TYPE "transaction_types" AS ENUM ('deposit', 'withdraw', 'refund');
 
 -- CreateEnum
+CREATE TYPE "transaction_statuses" AS ENUM ('pending', 'completed', 'failed');
+
+-- CreateEnum
 CREATE TYPE "product_types" AS ENUM ('continuous', 'discrete');
 
 -- CreateEnum
@@ -61,7 +64,7 @@ CREATE TABLE "transactions" (
     "customer" TEXT NOT NULL,
     "customer_phone" TEXT NOT NULL,
     "type" "transaction_types" NOT NULL,
-    "state" "entity_states" NOT NULL,
+    "state" "transaction_statuses" NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
@@ -75,6 +78,7 @@ CREATE TABLE "transaction_items" (
     "transaction_id" INTEGER NOT NULL,
     "product_id" INTEGER NOT NULL,
     "quantity" DOUBLE PRECISION NOT NULL,
+    "state" "entity_states" NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "deleted_at" TIMESTAMP(3),
