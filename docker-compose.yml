@@ -10,17 +10,19 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgres://postgres:root@postgres:5432/storage
+      - DATABASE_URL=postgres://postgres:root@postgres_db:5432/storage
       - MEILI_HOST=http://meilisearch:7700
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      - postgres
+      - postgres_db
       - meilisearch
       - redis
+    networks:
+      - app_network
     command: [ "sh", "-c", "npm install && npm run build && npm run start:prod" ]
 
-  postgres:
+  postgres_db:
     image: postgres:15
     container_name: postgres_db
     restart: always
@@ -32,6 +34,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
 
   meilisearch:
     image: getmeili/meilisearch:latest
@@ -41,17 +45,6 @@ services:
       MEILI_NO_ANALYTICS: true
     ports:
       - "7700:7700"
-
-  nginx:
-    image: nginx:latest
-    container_name: nginx_proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - nodejs
     networks:
       - app_network
 
@@ -61,6 +54,23 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - nodejs
+    networks:
+      - app_network
 
 networks:
   app_network:
