@@ -18,10 +18,11 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Add your private key to GitHub secrets
 
       - name: Deploy to server
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << EOF
-            cd ${{ secrets.PROJECT_PATH }}  # Navigate to your project directory
-            git pull origin main  # Pull latest changes from main branch
-            docker-compose down  # Stop and remove containers
-            docker-compose up -d  # Rebuild and start containers in detached mode
-          EOF
+        run:
+          ssh -o StrictHostKeyChecking=no -t ${{ secrets.USERNAME }}@${{ secrets.HOST }}
+          
+          #          cd ${{ secrets.PROJECT_PATH }}  # Navigate to your project directory
+          #          git pull origin main  # Pull latest changes from main branch
+          #          docker-compose down  # Stop and remove containers
+          #          docker-compose up -d  # Rebuild and start containers in detached mode
+          
