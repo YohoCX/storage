@@ -17,7 +17,7 @@ async function bootstrap() {
 
     app.enableCors({
         origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin)) {
+            if (!origin || allowedOrigins.includes(origin) || /https?:\/\/(www\.)?yohocx\.store/.test(origin)) {
                 callback(null, true);
             } else {
                 console.log(origin);
