@@ -1,5 +1,5 @@
 import { Exceptions } from '@exceptions';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -10,25 +10,24 @@ import { AppModule } from './app.module';
 async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
     await app.register(import('@fastify/cookie'));
-    app.useLogger(new Logger());
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
-    // const allowedOrigins = ['https://127.0.0.1:3030', 'https://127.0.0.1:3000'];
-    //
-    // app.enableCors({
-    //     origin: (origin, callback) => {
-    //         if (!origin || allowedOrigins.includes(origin) || /(https:)\/\/?[^/][A-Za-z0-9.:]*/i.test(origin)) {
-    //             callback(null, true);
-    //         } else {
-    //             console.log(origin);
-    //             callback(new Error('Not allowed by CORS'), false);
-    //         }
-    //     },
-    //     credentials: true,
-    //     allowedHeaders: 'Content-Type, Authorization',
-    //     methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-    // });
+    const allowedOrigins = ['http://127.0.0.1:3030', 'http://127.0.0.1:3000'];
+
+    app.enableCors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin) || /(https:)\/\/?[^/][A-Za-z0-9.:]*/i.test(origin)) {
+                callback(null, true);
+            } else {
+                console.log(origin);
+                callback(new Error('Not allowed by CORS'), false);
+            }
+        },
+        credentials: true,
+        allowedHeaders: 'Content-Type, Authorization',
+        methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    });
 
     app.useGlobalPipes(
         new ValidationPipe({

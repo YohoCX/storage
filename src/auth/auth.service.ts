@@ -43,27 +43,29 @@ export class AuthService {
 
         await this.cacheManager.set(accessToken, JSON.stringify(payload), 43200000);
 
-        reply.setCookie('token', accessToken, {
-            domain: 'api.yohocx.store',
-            path: '/',
-            httpOnly: true,
-            secure: 'auto',
-            sameSite: 'strict',
-            maxAge: 2592000,
-        });
+        console.log('Cache set:', accessToken, payload);
 
-        return {
-            user: {
-                id: user.id,
-                username: user.username,
-                role: user.role,
-                email: user.email,
-                state: user.state,
-                created_at: user.created_at,
-                updated_at: user.updated_at,
-            },
-            access_token: accessToken,
-        };
+        reply
+            .setCookie('token', accessToken, {
+                domain: '.yohocx.store',
+                path: '/',
+                httpOnly: true,
+                secure: 'auto',
+                sameSite: 'strict',
+                maxAge: 2592000,
+            })
+            .send({
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    role: user.role,
+                    email: user.email,
+                    state: user.state,
+                    created_at: user.created_at,
+                    updated_at: user.updated_at,
+                },
+                access_token: accessToken,
+            });
     }
 
     async getProfile(cached_user: Types.EntityDTO.Auth.CachedPayload) {

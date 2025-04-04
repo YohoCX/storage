@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   nodejs:
     image: node:22
@@ -12,8 +10,7 @@ services:
     environment:
       - DATABASE_URL=postgres://postgres:root@postgres_db:5432/storage
       - MEILI_HOST=http://meilisearch:7700
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - postgres_db
       - meilisearch
@@ -45,8 +42,6 @@ services:
       MEILI_NO_ANALYTICS: true
     ports:
       - "7700:7700"
-    volumes:
-      - meili_data:/meili_data
     networks:
       - app_network
     command: [ "meilisearch", "--db-path", "/meili_data" ]
@@ -82,4 +77,3 @@ networks:
 
 volumes:
   postgres_data:
-  meili_data:

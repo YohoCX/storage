@@ -1,9 +1,8 @@
 import { Entities } from '@entities';
 import { External } from '@external';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User as PrismaUser } from '@prisma/client';
 import { Types } from '@types';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class User {
@@ -47,7 +46,7 @@ export class User {
         });
 
         if (!raw) {
-            throw new NotFoundError('User not found');
+            throw new NotFoundException('User not found');
         }
 
         return this.mapRawToEntity(raw);
