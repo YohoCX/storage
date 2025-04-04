@@ -27,7 +27,7 @@ jobs:
 
       - name: Deploy via SSH
         run: |
-          ssh -i ~/.ssh/id_ed25519 root@your-server-ip << 'EOF'
+          ssh -i ~/.ssh/id_ed25519 root@138.199.230.194 << 'EOF'
             cd /root/storage
             git pull origin main
             docker-compose down
