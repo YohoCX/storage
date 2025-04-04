@@ -1,5 +1,5 @@
 import { Exceptions } from '@exceptions';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -10,6 +10,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
     await app.register(import('@fastify/cookie'));
+    app.useLogger(new Logger());
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
