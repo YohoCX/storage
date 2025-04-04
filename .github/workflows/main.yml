@@ -1,16 +1,19 @@
-name: 🚀 Deploy to Debian
+name: 🚀 Deploy to Server via Docker Compose
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to the main branch
 
 jobs:
   deploy:
-    name: Deploy Over SSH
+    name: Deploy to Server
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
       - name: Set up SSH for Git
         run: |
           mkdir -p ~/.ssh
@@ -18,15 +21,14 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-      - name: Set up SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Add server SSH key to known hosts
+        run: |
+          ssh-keyscan -H your-server-ip >> ~/.ssh/known_hosts
 
       - name: Deploy via SSH
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.HOST }} << 'EOF'
-            cd ${{ secrets.PROJECT_PATH }}
+          ssh -i ~/.ssh/id_ed25519 root@your-server-ip << 'EOF'
+            cd /root/your-node-app  # Replace with your actual project path
             git pull origin main
             docker-compose down
             docker-compose up -d --build
