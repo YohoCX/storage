@@ -20,7 +20,7 @@ services:
       - redis
     networks:
       - app_network
-    command: [ "sh", "-c", "npm install && npm run build && npm run start:prod" ]
+    command: [ "sh", "-c", "npm install && npx prisma migrate prod && npm run build && npm run start:prod" ]
 
   postgres_db:
     image: postgres:15
