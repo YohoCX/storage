@@ -45,7 +45,7 @@ export class AuthService {
 
         reply
             .setCookie('token', accessToken, {
-                domain: 'api.yohocx.store',
+                domain: '*.yohocx.store',
                 path: '/',
                 httpOnly: true,
                 secure: true,
