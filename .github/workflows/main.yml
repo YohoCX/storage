@@ -17,11 +17,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Add your private key to GitHub secrets
 
+      - name: Debug SSH
+        run: ssh -v -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} exit
+
       - name: Deploy to server
-        run:
-          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} \
-          "cd ${{ secrets.PROJECT_PATH }} && \
-          git pull origin main && \
-          docker-compose down && \
-          docker-compose up -d --build"
-          
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+            set -e
+            echo "Deploying to ${{ secrets.HOST }} as ${{ secrets.USERNAME }}"
+            cd ${{ secrets.PROJECT_PATH }}
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build
+          EOF
