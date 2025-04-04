@@ -1,8 +1,7 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Types } from '@types';
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -16,7 +15,6 @@ export class AuthController {
         return this.authService.login(body, reply);
     }
 
-    @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Logout' })
     @Post('logout')
     async logout(@Res() reply: FastifyReply, @Req() req: FastifyRequest) {
