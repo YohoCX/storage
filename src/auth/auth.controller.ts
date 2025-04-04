@@ -18,6 +18,7 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @ApiOperation({ summary: 'Logout' })
+    @Post('logout')
     async logout(@Res() reply: FastifyReply, @Req() req: FastifyRequest) {
         return this.authService.logout(reply, req);
     }
