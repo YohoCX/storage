@@ -4,7 +4,7 @@ import { Services } from '@services';
 import { Types } from '@types';
 import * as bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Injectable()
 export class AuthService {
@@ -77,7 +77,15 @@ export class AuthService {
         return JSON.parse(user);
     }
 
-    async logout(token: string) {
+    async logout(reply: FastifyReply, req: FastifyRequest) {
+        const token = req.cookies.token;
+
+        if (!token) {
+            throw new UnauthorizedException();
+        }
+
         await this.cacheManager.del(token);
+
+        reply.clearCookie('token').send('Logged out successfully');
     }
 }

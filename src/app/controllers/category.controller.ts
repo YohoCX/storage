@@ -28,6 +28,13 @@ export class Category {
         return this.categoryPresenter.formatPaginated(data.categories, data.total);
     }
 
+    @Get('search')
+    @ApiOperation({ summary: 'Search categories' })
+    @ApiParam({ name: 'query', type: 'string' })
+    async searchCategories(@Query('query') query: string) {
+        return await this.categoryService.search(query);
+    }
+
     @Post()
     @ApiOperation({ summary: 'Create new category' })
     @ApiBody({ type: DTOs.Category.Create })
