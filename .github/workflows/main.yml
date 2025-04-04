@@ -23,12 +23,12 @@ jobs:
 
       - name: Add server SSH key to known hosts
         run: |
-          ssh-keyscan -H your-server-ip >> ~/.ssh/known_hosts
+          ssh-keyscan -H 138.199.230.194 >> ~/.ssh/known_hosts
 
       - name: Deploy via SSH
         run: |
           ssh -i ~/.ssh/id_ed25519 root@your-server-ip << 'EOF'
-            cd /root/your-node-app  # Replace with your actual project path
+            cd /root/storage
             git pull origin main
             docker-compose down
             docker-compose up -d --build
