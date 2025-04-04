@@ -45,8 +45,11 @@ services:
       MEILI_NO_ANALYTICS: true
     ports:
       - "7700:7700"
+    volumes:
+      - meili_data:/meili_data
     networks:
       - app_network
+    command: [ "meilisearch", "--db-path", "/meili_data" ]
 
   redis:
     image: redis:alpine
@@ -79,3 +82,4 @@ networks:
 
 volumes:
   postgres_data:
+  meili_data:
