@@ -13,7 +13,7 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
-    const allowedOrigins = ['http://127.0.0.1:3030', 'http://127.0.0.1:3000'];
+    const allowedOrigins = ['https://127.0.0.1:3030', 'https://127.0.0.1:3000'];
 
     app.enableCors({
         origin: (origin, callback) => {
