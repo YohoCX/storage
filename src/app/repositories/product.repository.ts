@@ -1,6 +1,6 @@
 import { Entities } from '@entities';
 import { External } from '@external';
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { Product as PrismaProduct } from '@prisma/client';
 import { Types } from '@types';
 import { DTOs } from '../dtos';
@@ -113,7 +113,7 @@ export class Product {
         });
 
         if (!raw) {
-            throw new HttpException('Product not found', 404);
+            throw new NotFoundException('Product not found');
         }
 
         return this.mapRawToEntity(raw);
@@ -156,7 +156,7 @@ export class Product {
         }[],
     ) {
         await this.prismaService.$transaction(
-            data.map(( product ) =>
+            data.map((product) =>
                 this.prismaService.product.update({
                     where: { id: product.id },
                     data: {

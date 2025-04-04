@@ -1,6 +1,6 @@
 import { Entities } from '@entities';
 import { External } from '@external';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityState, Transaction as PrismaTransaction, TransactionStatus } from '@prisma/client';
 import { Types } from '@types';
 
@@ -81,7 +81,7 @@ export class Transaction {
         });
 
         if (!raw) {
-            throw new Error('Transaction not found');
+            throw new NotFoundException('Transaction not found');
         }
 
         return this.mapRawToEntity(raw);
