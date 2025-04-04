@@ -1,29 +1,27 @@
-name: 🚀 Deploy to Server via Docker Compose
+name: CI/CD for Docker Compose
 
 on:
   push:
     branches:
-      - main  # Trigger on push to the main branch
+      - main  # Trigger this on main branch updates
 
 jobs:
   deploy:
-    name: Deploy to Server
-    runs-on: debian-latest
-
+    runs-on: ubuntu-latest  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      - name: Set up SSH for Git
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.GIT_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ssh-keyscan -H "${{ secrets.HOST }}" >> ~/.ssh/known_hosts
-          echo "SSH setup complete."
+      - name: Set up SSH for server access
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Add your private key to GitHub secrets
 
-      - name: Deploy via SSH
+      - name: Deploy to server
         run: |
-          echo "Starting deployment on server: ${{ secrets.HOST }}"
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{secrets.SSH_USERNAME}}@${{ secrets.HOST }} "cd ${{ secrets.PROJECT_PATH }} && git pull origin main && docker-compose down && docker-compose up -d --build"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+            cd ${{ secrets.PROJECT_PATH }}  # Navigate to your project directory
+            git pull origin main  # Pull latest changes from main branch
+            docker-compose down  # Stop and remove containers
+            docker-compose up -d  # Rebuild and start containers in detached mode
+          EOF
