@@ -1,10 +1,24 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Category, Product } from '@prisma/client';
 import { Hits, MeiliSearch } from 'meilisearch';
 
 @Injectable()
-export class MeilisearchService<T> {
+export class MeilisearchService implements OnModuleInit {
     constructor(@Inject('MEILISEARCH_CLIENT') private readonly meiliClient: MeiliSearch) {}
+
+    async onModuleInit() {
+        if (!(await this.meiliClient.isHealthy())) {
+            console.error('MeiliSearch is not healthy');
+        }
+
+        const indexes = await this.meiliClient.getIndexes();
+        if (!indexes.results.length) {
+            await this.createIndexes();
+        }
+
+        console.log(indexes.results);
+        console.log('MeiliSearch is healthy');
+    }
 
     async searchIndex(index: string, query: string): Promise<Hits<Category | Product>> {
         const result = await this.meiliClient.index(index).search<Category | Product>(query);
