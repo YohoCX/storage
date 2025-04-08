@@ -21,6 +21,16 @@ export class Transaction {
         return this.transactionRepository.getById(id);
     }
 
+    public async getPendingTransaction(user_id: string) {
+        const transaction = await this.transactionRepository.getPendingTransaction(user_id);
+
+        if (!transaction) {
+            throw new HttpException('Transaction not found', 404);
+        }
+
+        return transaction;
+    }
+
     public async create(data: DTOs.Transaction.Create, user_id: string) {
         const userHasActiveTransaction = await this.transactionRepository.userHasActiveTransaction(user_id);
 

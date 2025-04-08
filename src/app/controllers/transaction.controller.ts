@@ -29,6 +29,13 @@ export class Transaction {
         return this.transactionPresenter.formatPaginated(data.data, data.total);
     }
 
+    @Get('pending')
+    @ApiOperation({ summary: 'Get pending transaction' })
+    async getPendingTransaction(@Decorators.CurrentUser() current_user: Types.EntityDTO.Auth.CachedPayload) {
+        const transaction = await this.transactionService.getPendingTransaction(current_user.id);
+        return this.transactionPresenter.format(transaction);
+    }
+
     @Get(':id/items')
     @ApiOperation({ summary: 'Get transaction items by transaction id' })
     @ApiParam({ name: 'id', type: 'number' })

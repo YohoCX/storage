@@ -1,6 +1,6 @@
 import { Entities } from '@entities';
 import { External } from '@external';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityState, Transaction as PrismaTransaction, TransactionStatus } from '@prisma/client';
 import { Types } from '@types';
 
@@ -43,6 +43,21 @@ export class Transaction {
             data: raw.map((r) => this.mapRawToEntity(r)),
             total,
         };
+    }
+
+    public async getPendingTransaction(user_id: string) {
+        const transaction = await this.prismaService.transaction.findFirst({
+            where: {
+                user_id,
+                state: 'pending' satisfies TransactionStatus,
+            },
+        });
+
+        if (!transaction) {
+            throw new HttpException('No pending transaction found', 204);
+        }
+
+        return this.mapRawToEntity(transaction);
     }
 
     public async create(data: Entities.Transaction) {
