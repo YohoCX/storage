@@ -103,13 +103,13 @@ export class Product {
         return updated;
     }
 
-    public async updateQuantity(items_to_update: { id: number; quantity: number }[]) {
+    public async updateQuantity(items_to_update: { id: number; quantity: number }[], withdraw: boolean) {
         const products = await this.productRepository.getAllByIds(items_to_update.map((item) => item.id));
 
         const updated = products.map((product) => {
             const item = items_to_update.find((item) => item.id === product.id);
             if (item) {
-                product.total = product.total - item.quantity;
+                product.total = product.total - (withdraw ? item.quantity : -item.quantity);
                 product.setUpdated();
             }
             return product;

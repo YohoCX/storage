@@ -3,6 +3,7 @@ import { External } from '@external';
 import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityState, Transaction as PrismaTransaction, TransactionStatus } from '@prisma/client';
 import { Types } from '@types';
+import { DTOs } from '../dtos';
 
 @Injectable()
 export class Transaction {
@@ -24,8 +25,12 @@ export class Transaction {
         );
     }
 
-    public async getAllPaginated(pagination: Types.PaginationOptions) {
+    public async getAllPaginated(pagination: Types.PaginationOptions, filters: DTOs.Transaction.Filter) {
         const raw = await this.prismaService.transaction.findMany({
+            where: {
+                state: filters.status,
+                type: filters.type,
+            },
             skip: pagination.offset,
             take: pagination.limit,
         });

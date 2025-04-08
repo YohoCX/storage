@@ -24,8 +24,8 @@ export class Transaction {
 
     @Get()
     @ApiOperation({ summary: 'Get all transactions paginated' })
-    async getTransactionsPaginated(@Query() pagination: DTOs.Pagination) {
-        const data = await this.transactionService.getAllPaginated(pagination.options);
+    async getTransactionsPaginated(@Query() pagination: DTOs.Pagination, @Query() filters: DTOs.Transaction.Filter) {
+        const data = await this.transactionService.getAllPaginated(pagination.options, filters);
         return this.transactionPresenter.formatPaginated(data.data, data.total);
     }
 

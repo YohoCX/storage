@@ -13,8 +13,8 @@ export class Transaction {
         private readonly productService: Product,
     ) {}
 
-    public async getAllPaginated(pagination: Types.PaginationOptions) {
-        return this.transactionRepository.getAllPaginated(pagination);
+    public async getAllPaginated(pagination: Types.PaginationOptions, filters: DTOs.Transaction.Filter) {
+        return this.transactionRepository.getAllPaginated(pagination, filters);
     }
 
     public async getById(id: number) {
@@ -86,7 +86,8 @@ export class Transaction {
         }
 
         const product = await this.productService.getById(data.product_id);
-        if (product.total < data.amount) {
+
+        if (transaction.type === 'withdraw' && product.total < data.amount) {
             throw new HttpException('Not enough stock', 400);
         }
 
@@ -112,11 +113,10 @@ export class Transaction {
             throw new HttpException('Product not found in cart', 400);
         }
 
-        if (transaction.type === 'withdraw') {
-            const product = await this.productService.getById(data.product_id);
-            if (product.total < data.amount) {
-                throw new HttpException('Not enough stock', 400);
-            }
+        const product = await this.productService.getById(data.product_id);
+
+        if (transaction.type === 'withdraw' && product.total < data.amount) {
+            throw new HttpException('Not enough stock', 400);
         }
 
         await this.transactionRepository.updateTransactionItem(existingProduct.id, data.amount);
@@ -152,7 +152,13 @@ export class Transaction {
         const productsToAdd = products
             .filter((p) => {
                 const existingProduct = existingProducts.find((ep) => ep.product_id === p.id);
-                return !existingProduct && p.total >= data.products.find((dp) => dp.product_id === p.id).amount;
+                if (transaction.type === 'withdraw') {
+                    if (p.total >= data.products.find((dp) => dp.product_id === p.id).amount) {
+                        return !existingProduct;
+                    }
+                    throw new HttpException(`Not enough stock, product_id: ${p.id}`, 400);
+                }
+                return !existingProduct;
             })
             .map((p) => {
                 return {
@@ -169,8 +175,10 @@ export class Transaction {
             })
             .map((ep) => {
                 const quantity = data.products.find((dp) => dp.product_id === ep.product_id).amount;
-                if (quantity > products.find((p) => p.id === ep.product_id).total) {
-                    throw new HttpException(`Not enough stock, product_id: ${ep.product_id}`, 400);
+                if (transaction.type === 'withdraw') {
+                    if (quantity > products.find((p) => p.id === ep.product_id).total) {
+                        throw new HttpException(`Not enough stock, product_id: ${ep.product_id}`, 400);
+                    }
                 }
                 return {
                     transaction_item_id: ep.id,
@@ -192,9 +200,15 @@ export class Transaction {
     }
 
     public async performTransaction(transaction_id: number) {
+        const transaction = await this.transactionRepository.getById(transaction_id);
+
+        if (transaction.state !== 'pending') {
+            throw new HttpException('Transaction is completed', 400);
+        }
+
         const items = await this.transactionRepository.getItemsByTransactionId(transaction_id);
 
-        await this.productService.updateQuantity(items);
+        await this.productService.updateQuantity(items, transaction.type === 'withdraw');
 
         await this.transactionRepository.performTransaction(transaction_id);
     }
