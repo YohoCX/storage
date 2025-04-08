@@ -24,6 +24,7 @@ export class Transaction {
         this._customer = dto.customer;
         this._customer_phone = dto.customer_phone;
         this._type = dto.type;
+        this._state = dto.state;
     }
 
     public get id(): number {

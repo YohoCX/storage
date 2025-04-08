@@ -52,7 +52,7 @@ export class Transaction {
                 customer: data.customer,
                 customer_phone: data.customer_phone,
                 type: data.type,
-                state: 'pending',
+                state: data.state,
             },
         });
 
