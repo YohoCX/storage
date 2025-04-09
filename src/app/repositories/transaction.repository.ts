@@ -192,15 +192,13 @@ export class Transaction {
             quantity: number;
         }[],
     ) {
-        await this.prismaService.transactionItems.updateMany({
-            where: {
-                id: {
-                    in: data.map((d) => d.transaction_item_id),
-                },
-            },
-            data: data.map((d) => ({
-                quantity: d.quantity,
-            })),
+        await this.prismaService.$transaction(async (prisma) => {
+            for (const item of data) {
+                await prisma.transactionItems.update({
+                    where: { id: item.transaction_item_id },
+                    data: { quantity: item.quantity },
+                });
+            }
         });
     }
 

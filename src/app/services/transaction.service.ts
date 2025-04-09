@@ -122,7 +122,7 @@ export class Transaction {
         await this.transactionRepository.updateTransactionItem(existingProduct.id, data.amount);
     }
 
-    public async removeCartItem(product_id: number, transaction_id: number) {
+    public async removeCartItem(transaction_id: number, product_id: number) {
         const transaction = await this.transactionRepository.getById(transaction_id);
         if (transaction.state !== 'pending') {
             throw new HttpException('Transaction is completed', 400);
