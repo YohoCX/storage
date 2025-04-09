@@ -1,5 +1,7 @@
+import { HttpException } from '@nestjs/common';
 import { EntityState, ProductType } from '@prisma/client';
 import { Types } from '@types';
+import { Category } from './category.entity';
 
 export class Product {
     private readonly _id: number;
@@ -12,6 +14,7 @@ export class Product {
     private readonly _created_at: Date;
     private _updated_at: Date | null;
     private _deleted_at: Date | null;
+    private _category?: Category | null;
 
     public constructor(dto: Types.EntityDTO.Product.Create | Types.EntityDTO.Product.Restore) {
         if (dto instanceof Types.EntityDTO.Product.Restore) {
@@ -114,5 +117,16 @@ export class Product {
 
     public refund(amount: number) {
         this._total = this._total + amount;
+    }
+
+    public set category(category: Category) {
+        this._category = category;
+    }
+
+    public get category() {
+        if (!this._category) {
+            throw new HttpException('Category not set', 400);
+        }
+        return this._category;
     }
 }

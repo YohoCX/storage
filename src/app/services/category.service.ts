@@ -9,7 +9,7 @@ import { DTOs } from '../dtos';
 export class Category {
     constructor(
         private readonly categoryRepository: Repositories.Category,
-        private readonly searchService: External.MeiliSearch.MeilisearchService<Entities.Category>,
+        private readonly searchService: External.MeiliSearch.MeilisearchService,
     ) {}
 
     public async search(query: string) {

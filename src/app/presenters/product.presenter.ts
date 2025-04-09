@@ -9,6 +9,7 @@ export class Product {
             category_id: entity.category_id,
             name: entity.name,
             description: entity.description,
+            category_name: this.setCategoryName(entity),
             total: entity.total,
             type: entity.type,
             state: entity.state,
@@ -24,5 +25,15 @@ export class Product {
 
     public formatPaginated(entities: Entities.Product[], total: number) {
         return { data: entities.map((entity) => this.format(entity)), total };
+    }
+
+    private setCategoryName(entity: Entities.Product) {
+        try {
+            if (entity.category) {
+                return entity.category.name;
+            }
+        } catch (e) {
+            return undefined;
+        }
     }
 }

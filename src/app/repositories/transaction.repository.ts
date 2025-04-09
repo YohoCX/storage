@@ -108,12 +108,35 @@ export class Transaction {
     }
 
     public async getItemsByTransactionId(transaction_id: number) {
-        return await this.prismaService.transactionItems.findMany({
+        const data = await this.prismaService.transactionItems.findMany({
             where: {
                 transaction_id,
                 state: 'active' satisfies EntityState,
             },
+            include: {
+                product: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
         });
+
+        if (!data.length) {
+            return [];
+        }
+
+        return data.map((d) => ({
+            id: d.id,
+            transaction_id: d.transaction_id,
+            product_id: d.product_id,
+            quantity: d.quantity,
+            state: d.state,
+            created_at: d.created_at,
+            updated_at: d.updated_at,
+            deleted_at: d.deleted_at,
+            product_name: d.product.name,
+        }));
     }
 
     public async userHasActiveTransaction(user_id: string) {

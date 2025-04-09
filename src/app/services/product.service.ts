@@ -9,7 +9,7 @@ import { External } from '@external';
 export class Product {
     constructor(
         private readonly productRepository: Repositories.Product,
-        private readonly searchService: External.MeiliSearch.MeilisearchService<Entities.Product>,
+        private readonly searchService: External.MeiliSearch.MeilisearchService,
     ) {}
 
     public async getAllPaginated(pagination: Types.PaginationOptions, filters: DTOs.Product.Filters) {

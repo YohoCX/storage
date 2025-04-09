@@ -1,7 +1,7 @@
 import { Entities } from '@entities';
 import { External } from '@external';
-import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
-import { Product as PrismaProduct } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Category, Product as PrismaProduct } from '@prisma/client';
 import { Types } from '@types';
 import { DTOs } from '../dtos';
 
@@ -9,8 +9,8 @@ import { DTOs } from '../dtos';
 export class Product {
     constructor(private readonly prismaService: External.Prisma.PrismaService) {}
 
-    private mapRawToEntity(raw: PrismaProduct): Entities.Product {
-        return new Entities.Product(
+    private mapRawToEntity(raw: PrismaProduct & { category?: Category }): Entities.Product {
+        const product = new Entities.Product(
             new Types.EntityDTO.Product.Restore(
                 raw.id,
                 raw.category_id,
@@ -24,6 +24,22 @@ export class Product {
                 raw.deleted_at,
             ),
         );
+
+        if (raw.category) {
+            product.category = new Entities.Category(
+                new Types.EntityDTO.Category.Restore(
+                    raw.category.id,
+                    raw.category.name,
+                    raw.category.description,
+                    raw.category.state,
+                    raw.category.created_at,
+                    raw.category.updated_at,
+                    raw.category.deleted_at,
+                ),
+            );
+        }
+
+        return product;
     }
 
     public async getAllByIds(ids: number[]) {
@@ -47,6 +63,9 @@ export class Product {
             where: {
                 category_id: filters.categoryId,
                 state: 'active',
+            },
+            include: {
+                category: true,
             },
             skip: pagination.offset,
             take: pagination.limit,
