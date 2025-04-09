@@ -1,6 +1,6 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDecimal, IsInt, IsPositive } from 'class-validator';
+import { IsInt, IsNumber, IsPositive } from 'class-validator';
 
 @ApiSchema({ name: 'Transaction Item' })
 export class TransactionProduct {
@@ -19,7 +19,7 @@ export class TransactionProduct {
         description: 'Amount, decimal',
         example: 1,
     })
-    @IsDecimal()
+    @IsNumber()
     @IsPositive()
     @Type(() => Number)
     amount!: number;
