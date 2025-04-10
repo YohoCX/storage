@@ -67,19 +67,20 @@ export class Transaction {
         };
     }
 
-    @Post(':id/update-product')
-    @ApiOperation({ summary: 'Update product in transaction' })
-    @ApiBody({ type: DTOs.Transaction.TransactionProduct })
-    async updateProductInTransaction(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() body: DTOs.Transaction.TransactionProduct,
-    ) {
-        await this.transactionService.updateCartItem(body, id);
-
-        return {
-            message: 'Success',
-        };
-    }
+    //
+    // @Post(':id/update-product')
+    // @ApiOperation({ summary: 'Update product in transaction' })
+    // @ApiBody({ type: DTOs.Transaction.TransactionProduct })
+    // async updateProductInTransaction(
+    //     @Param('id', ParseIntPipe) id: number,
+    //     @Body() body: DTOs.Transaction.TransactionProduct,
+    // ) {
+    //     await this.transactionService.updateCartItem(body, id);
+    //
+    //     return {
+    //         message: 'Success',
+    //     };
+    // }
 
     @Post(':id/remove-product/:product_id')
     @ApiOperation({ summary: 'Remove product from transaction' })

@@ -104,12 +104,12 @@ export class Transaction {
             throw new HttpException('Transaction is completed', 400);
         }
 
-        const existingProduct = await this.transactionRepository.getTransactionItemByProductId(
+        const existingItem = await this.transactionRepository.getTransactionItemByProductId(
             transaction_id,
             data.product_id,
         );
 
-        if (!existingProduct) {
+        if (!existingItem) {
             throw new HttpException('Product not found in cart', 400);
         }
 
@@ -119,7 +119,7 @@ export class Transaction {
             throw new HttpException('Not enough stock', 400);
         }
 
-        await this.transactionRepository.updateTransactionItem(existingProduct.id, data.amount);
+        await this.transactionRepository.updateTransactionItem(existingItem.id, data.amount);
     }
 
     public async removeCartItem(transaction_id: number, product_id: number) {

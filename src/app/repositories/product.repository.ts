@@ -175,15 +175,15 @@ export class Product {
         }[],
     ) {
         await this.prismaService.$transaction(
-            data.map((product) =>
-                this.prismaService.product.update({
+            data.map((product) => {
+                return this.prismaService.product.update({
                     where: { id: product.id },
                     data: {
                         total: product.total,
                         updated_at: new Date(),
                     },
-                }),
-            ),
+                });
+            }),
         );
     }
 }

@@ -117,6 +117,7 @@ export class Transaction {
                 product: {
                     select: {
                         name: true,
+                        total: true,
                     },
                 },
             },
@@ -130,6 +131,7 @@ export class Transaction {
             id: d.id,
             transaction_id: d.transaction_id,
             product_id: d.product_id,
+            product_total: Number(d.product.total),
             quantity: d.quantity,
             state: d.state,
             created_at: d.created_at,
@@ -203,14 +205,16 @@ export class Transaction {
     }
 
     public async updateTransactionItem(transaction_item_id: number, quantity: number) {
-        await this.prismaService.transactionItems.update({
+        const data = await this.prismaService.transactionItems.update({
             where: {
                 id: transaction_item_id,
             },
             data: {
-                quantity,
+                quantity: quantity,
             },
         });
+
+        console.log(data);
     }
 
     public async removeTransactionItems(transaction_item_ids: number[]) {

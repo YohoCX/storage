@@ -103,15 +103,17 @@ export class Product {
         return updated;
     }
 
-    public async updateQuantity(items_to_update: { id: number; quantity: number }[], withdraw: boolean) {
-        const products = await this.productRepository.getAllByIds(items_to_update.map((item) => item.id));
+    public async updateQuantity(items_to_update: { product_id: number; quantity: number }[], withdraw: boolean) {
+        const products = await this.productRepository.getAllByIds(items_to_update.map((item) => item.product_id));
 
         const updated = products.map((product) => {
-            const item = items_to_update.find((item) => item.id === product.id);
-            if (item) {
-                product.total = product.total - (withdraw ? item.quantity : -item.quantity);
-                product.setUpdated();
+            const item = items_to_update.find((item) => item.product_id === product.id);
+            if (withdraw) {
+                product.withdraw(item.quantity);
+            } else {
+                product.deposit(item.quantity);
             }
+            product.setUpdated();
             return product;
         });
 
