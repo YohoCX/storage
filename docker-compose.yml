@@ -8,7 +8,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgres://postgres:root@postgres_db:5432/storage
+      - DATABASE_URL=${DATABASE_URL}
       - MEILI_HOST=http://meilisearch:7700
       - REDIS_URL=redis://redis:6379
     depends_on:
@@ -19,27 +19,14 @@ services:
       - app_network
     command: [ "sh", "-c", "npm install && npx prisma migrate deploy && npm run build && npm run start:prod" ]
 
-  postgres_db:
-    image: postgres:15
-    container_name: postgres_db
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: storage
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app_network
-
   meilisearch:
     image: getmeili/meilisearch:latest
     container_name: meilisearch
     restart: always
     environment:
       MEILI_NO_ANALYTICS: true
+    volumes:
+      - meili_data:/meili_data
     ports:
       - "7700:7700"
     networks:
@@ -76,4 +63,4 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_data:
+  meili_data:

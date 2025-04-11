@@ -24,7 +24,6 @@ async function bootstrap() {
                 callback(new Error('Not allowed by CORS'), false);
             }
         },
-        credentials: true,
         allowedHeaders: 'Content-Type, Authorization',
         methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
     });
