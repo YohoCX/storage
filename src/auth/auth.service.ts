@@ -45,27 +45,18 @@ export class AuthService {
 
         console.log('Cache set:', accessToken, payload);
 
-        reply
-            .setCookie('token', accessToken, {
-                domain: '.yohocx.store',
-                path: '/',
-                httpOnly: true,
-                secure: 'auto',
-                sameSite: 'strict',
-                maxAge: 2592000,
-            })
-            .send({
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    role: user.role,
-                    email: user.email,
-                    state: user.state,
-                    created_at: user.created_at,
-                    updated_at: user.updated_at,
-                },
-                access_token: accessToken,
-            });
+        reply.header('authorization', `Bearer ${accessToken}`).send({
+            user: {
+                id: user.id,
+                username: user.username,
+                role: user.role,
+                email: user.email,
+                state: user.state,
+                created_at: user.created_at,
+                updated_at: user.updated_at,
+            },
+            access_token: accessToken,
+        });
     }
 
     async getProfile(cached_user: Types.EntityDTO.Auth.CachedPayload) {
@@ -89,6 +80,6 @@ export class AuthService {
 
         await this.cacheManager.del(token);
 
-        reply.clearCookie('token').send('Logged out successfully');
+        reply.removeHeader('authorization').send('Logged out successfully');
     }
 }

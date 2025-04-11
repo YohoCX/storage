@@ -4,6 +4,7 @@ import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Services } from '@services';
 import { Types } from '@types';
 import { AuthGuard } from '../../auth/auth.guard';
+import { Roles } from '../../decorators/role.decorator';
 import { DTOs } from '../dtos';
 import { Presenters } from '../presenters';
 
@@ -120,6 +121,7 @@ export class Transaction {
         };
     }
 
+    @Roles('admin')
     @Delete(':id')
     @ApiOperation({ summary: 'Cancel transaction' })
     @ApiParam({ name: 'id', type: 'number' })

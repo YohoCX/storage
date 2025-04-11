@@ -4,6 +4,7 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { Services } from '@services';
 import { Types } from '@types';
 import { AuthGuard } from '../../auth/auth.guard';
+import { Roles } from '../../decorators/role.decorator';
 import { Presenters } from '../presenters';
 
 @Controller('user')
@@ -14,6 +15,7 @@ export class User {
         private readonly userPresenter: Presenters.User,
     ) {}
 
+    @Roles('admin')
     @ApiOperation({ summary: 'Create user' })
     @ApiBody({ type: Types.EntityDTO.User.Add })
     @Post('create')

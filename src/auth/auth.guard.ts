@@ -9,14 +9,15 @@ import {
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { Types } from '@types';
+import { FastifyRequest } from 'fastify';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
     constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
     async canActivate(context: ExecutionContext) {
-        const request = context.switchToHttp().getRequest();
-        const token = request.cookies.token;
+        const request: FastifyRequest = context.switchToHttp().getRequest();
+        const token = request.headers.authorization?.split(' ').pop();
 
         if (!token) {
             throw new UnauthorizedException();
