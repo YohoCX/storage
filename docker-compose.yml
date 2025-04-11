@@ -12,7 +12,6 @@ services:
       - MEILI_HOST=http://meilisearch:7700
       - REDIS_URL=redis://redis:6379
     depends_on:
-      - postgres_db
       - meilisearch
       - redis
     networks:
