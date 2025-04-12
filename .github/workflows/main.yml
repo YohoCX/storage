@@ -1,29 +1,42 @@
-name: CI/CD for Docker Compose
+name: CI/CD for Storage App
 
 on:
   push:
     branches:
-      - main  # Trigger this on main branch updates
+      - main
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up SSH for server access
+      - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Add your private key to GitHub secrets
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
             set -e
-            echo "Deploying to ${{ secrets.HOST }} as ${{ secrets.USERNAME }}"
+            echo "🔄 Pulling latest code..."
             cd ${{ secrets.PROJECT_PATH }}
             git pull origin main
-            docker compose down
-            docker compose up -d --build
+
+            echo "📦 Installing dependencies..."
+            npm ci
+
+            echo "🔄 Running Prisma migrations..."
+            npx prisma migrate deploy
+
+            echo "🛠️ Building app..."
+            npm run build
+
+            echo "🚀 Restarting service..."
+            sudo systemctl restart storage-app
+
+            echo "✅ Deployment done!"
           EOF
