@@ -22,21 +22,12 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
             set -e
-            echo "🔄 Pulling latest code..."
+            echo "Deploying to ${{ secrets.HOST }} as ${{ secrets.USERNAME }}"
             cd ${{ secrets.PROJECT_PATH }}
             git pull origin main
-
-            echo "📦 Installing dependencies..."
-            npm ci
-
-            echo "🔄 Running Prisma migrations..."
-            npx prisma migrate deploy
-
-            echo "🛠️ Building app..."
+            npm i
+          
             npm run build
-
-            echo "🚀 Restarting service..."
-            sudo systemctl restart storage-app
-
-            echo "✅ Deployment done!"
+          
+            pm2 restart all
           EOF
