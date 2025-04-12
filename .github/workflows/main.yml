@@ -52,7 +52,6 @@ jobs:
       - name: Reload pm2
         run: |
           echo "Reloading pm2..."
-          ~/.bashrc
           pm2 restart start-prod-storage
 
       - name: Tag Deployment
