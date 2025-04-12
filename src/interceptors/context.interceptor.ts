@@ -6,6 +6,7 @@ import {
     NestInterceptor,
     UnauthorizedException,
 } from '@nestjs/common';
+import { FastifyRequest } from 'fastify';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 
@@ -16,10 +17,10 @@ export class ContextInterceptor implements NestInterceptor {
     ) {}
 
     async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
-        const request = context.switchToHttp().getRequest();
+        const request: FastifyRequest = context.switchToHttp().getRequest();
+        const token = request.headers.authorization?.split(' ').pop();
         try {
-            const token = request.cookies.token;
-            request.user = await this.authService.getUser(token);
+            request['user'] = await this.authService.getUser(token);
         } catch (error) {
             if (error instanceof UnauthorizedException || error instanceof ForbiddenException) {
                 return next.handle();
