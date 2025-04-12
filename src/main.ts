@@ -17,6 +17,9 @@ async function bootstrap() {
 
     app.enableCors({
         origin: (origin, callback) => {
+            if (!['development', 'production'].includes(process.env.NODE_ENV)) {
+                callback(new Error('Invalid environment'), false);
+            }
             console.info('CORS origin:', origin);
             if (process.env.NODE_ENV === 'development') {
                 if (!origin || allowedOrigins.includes(origin) || /(https:)\/\/?[^/][A-Za-z0-9.:]*/i.test(origin)) {
@@ -32,7 +35,6 @@ async function bootstrap() {
                     callback(new Error('Not allowed by CORS'), false);
                 }
             }
-            throw new Error('undefined environment');
         },
         allowedHeaders: 'Content-Type, Authorization',
         methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
