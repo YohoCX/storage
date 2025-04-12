@@ -17,6 +17,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         this.logger.log('Connecting to the database...');
         await this.$connect();
         this.logger.log('Connected to the database');
+
+        if (this.configService.get<string>('NODE_ENV') !== 'production') {
+            return;
+        }
+
         const admin = await this.user.findUnique({
             where: {
                 username: 'admin',

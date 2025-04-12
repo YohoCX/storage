@@ -6,19 +6,39 @@ on:
       - main  # Trigger this on main branch updates
 
 jobs:
-  lint:
+  checkout:
     runs-on: self-hosted  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'  # Specify the Node.js version
 
       - name: Install dependencies
         run: npm ci  # Install dependencies
 
       - name: Run Lint
         run: npm run lint  # Run linting
+
+      - name: Run Build
+        run: npm run build  # Build the project
+
+  deploy:
+    runs-on: self-hosted  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
+    needs: checkout  # Ensure this job runs after the checkout job
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to server
+        run: |
+          echo "Deploying to server..."
+          cd ${{ secrets.PROJECT_DIR}}
+          git pull
+          npm ci
+          npm run build
+          pm2 restart start-prod-storage
+
+      - name: Tag Deployment
+        run: |
+          git tag -a "deploy-$(date +'%Y%m%d%H%M%S')" -m "Deployment to server"
+          git push origin --tags
+

@@ -16,8 +16,7 @@ export class MeilisearchService implements OnModuleInit {
             await this.createIndexes();
         }
 
-        console.log(indexes.results);
-        console.log('MeiliSearch is healthy');
+        console.info('MeiliSearch is healthy');
     }
 
     async searchIndex(index: string, query: string): Promise<Hits<Category | Product>> {

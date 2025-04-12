@@ -13,7 +13,7 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
-    const allowedOrigins = ['http://127.0.0.1:3030', 'http://127.0.0.1:3000'];
+    const allowedOrigins = ['http://localhost:3000'];
 
     app.enableCors({
         origin: (origin, callback) => {
@@ -53,7 +53,7 @@ async function bootstrap() {
     });
 
     const port = process.env.PORT || 3000;
-    await app.listen(port, '0.0.0.0');
+    await app.listen(port);
     console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
