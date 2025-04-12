@@ -1,4 +1,4 @@
-name: CI/CD for Docker Compose
+name: Deploy to Server
 
 on:
   push:
@@ -6,25 +6,19 @@ on:
       - main  # Trigger this on main branch updates
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
+  lint:
+    runs-on: self-hosted  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up SSH for server access
-        uses: webfactory/ssh-agent@v0.5.3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Add your private key to GitHub secrets
+          node-version: '22'  # Specify the Node.js version
 
-      - name: Deploy to server
-        run: |
-          ssh -T -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-            set -e
-            echo "Deploying to ${{ secrets.HOST }} as ${{ secrets.USERNAME }}"
-            cd ${{ secrets.PROJECT_PATH }}
-            git pull origin main
-            npm i
-            npm run build
-            npm run start:prod
-          EOF
+      - name: Install dependencies
+        run: npm ci  # Install dependencies
+
+      - name: Run Lint
+        run: npm run lint  # Run linting
