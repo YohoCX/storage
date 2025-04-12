@@ -13,6 +13,7 @@ import { MeilisearchService } from './meili.service';
             useFactory: (configService: ConfigService) => {
                 return new MeiliSearch({
                     host: configService.get<string>('MEILI_HOST'),
+                    apiKey: configService.get<string>('MEILI_KEY'),
                 });
             },
         },
