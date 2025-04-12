@@ -12,23 +12,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up NVM
-        run: |
-          export NVM_DIR="${{ secrets.NVM_DIR }}"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        shell: bash
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'  # Use the required version of Node.js
+          cache: 'npm'        # Enable npm caching for faster builds
 
       - name: Install dependencies
         run: npm ci  # Install dependencies
-        shell: bash
 
       - name: Run Lint
         run: npm run lint  # Run linting
-        shell: bash
 
       - name: Run Build
         run: npm run build  # Build the project
-        shell: bash
 
   deploy:
     runs-on: self-hosted  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
@@ -37,11 +34,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up NVM
-        run: |
-          export NVM_DIR="${{ secrets.NVM_DIR }}"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-        shell: bash
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'  # Use the required version of Node.js
+          cache: 'npm'        # Enable npm caching for faster builds
+
 
       - name: Deploy to server
         run: |
@@ -50,8 +48,12 @@ jobs:
           git pull
           npm ci
           npm run build
+
+      - name: Reload pm2
+        run: |
+          echo "Reloading pm2..."
+          ~/.bashrc
           pm2 restart start-prod-storage
-        shell: bash
 
       - name: Tag Deployment
         run: |
