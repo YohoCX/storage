@@ -13,7 +13,7 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
-    const allowedOrigins = ['http://localhost:3000'];
+    const allowedOrigins = ['http://localhost:3000', 'https://localhost:5173'];
 
     app.enableCors({
         origin: (origin, callback) => {
