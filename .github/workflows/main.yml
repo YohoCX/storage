@@ -1,22 +1,21 @@
-name: CI/CD for Storage App
+name: CI/CD for Docker Compose
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger this on main branch updates
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up SSH
+      - name: Set up SSH for server access
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # Add your private key to GitHub secrets
 
       - name: Deploy to server
         run: |
@@ -26,8 +25,6 @@ jobs:
             cd ${{ secrets.PROJECT_PATH }}
             git pull origin main
             npm i
-          
             npm run build
-          
-            pm2 restart all
+            npm run start:prod
           EOF
