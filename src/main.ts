@@ -13,17 +13,26 @@ async function bootstrap() {
     app.setGlobalPrefix('api/v1');
     app.useGlobalFilters(new Exceptions.AllExceptionsFilter());
 
-    const allowedOrigins = ['http://localhost:3000', 'http://localhost:5173'];
+    const allowedOrigins = ['http://localhost:3000', 'https://oxus.frontend.yohocx.store'];
 
     app.enableCors({
         origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin) || /(https:)\/\/?[^/][A-Za-z0-9.:]*/i.test(origin)) {
-                console.log(origin);
-                callback(null, true);
-            } else {
-                console.log(origin);
-                callback(new Error('Not allowed by CORS'), false);
+            console.info('CORS origin:', origin);
+            if (process.env.NODE_ENV === 'development') {
+                if (!origin || allowedOrigins.includes(origin) || /(https:)\/\/?[^/][A-Za-z0-9.:]*/i.test(origin)) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'), false);
+                }
             }
+            if (process.env.NODE_ENV === 'production') {
+                if (!origin || allowedOrigins.includes(origin)) {
+                    callback(null, true);
+                } else {
+                    callback(new Error('Not allowed by CORS'), false);
+                }
+            }
+            throw new Error('undefined environment');
         },
         allowedHeaders: 'Content-Type, Authorization',
         methods: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
