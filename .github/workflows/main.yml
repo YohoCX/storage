@@ -12,19 +12,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js environment
+      - name: Set up NVM
         run: |
-          export NVM_DIR="${{secrets.NVM_DIR}}/.nvm"
+          export NVM_DIR="${{ secrets.NVM_DIR }}"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        shell: bash
 
       - name: Install dependencies
         run: npm ci  # Install dependencies
+        shell: bash
 
       - name: Run Lint
         run: npm run lint  # Run linting
+        shell: bash
 
       - name: Run Build
         run: npm run build  # Build the project
+        shell: bash
 
   deploy:
     runs-on: self-hosted  # Use a GitHub-hosted runner (could be a self-hosted runner if needed)
@@ -33,10 +37,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js environment
+      - name: Set up NVM
         run: |
-          export NVM_DIR="${{secrets.NVM_DIR}}/.nvm"
+          export NVM_DIR="${{ secrets.NVM_DIR }}"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        shell: bash
 
       - name: Deploy to server
         run: |
@@ -46,6 +51,7 @@ jobs:
           npm ci
           npm run build
           pm2 restart start-prod-storage
+        shell: bash
 
       - name: Tag Deployment
         run: |
